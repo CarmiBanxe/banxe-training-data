@@ -14,7 +14,9 @@ jobs:
           fetch-depth: 0
 
       - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/carmibanxe1/banxe-training-data.git
+          git remote add gitlab "https://CarmiBanxe:${GITLAB_TOKEN}@gitlab.com/carmibanxe1/banxe-training-data.git"
           git push gitlab --all --force
           git push gitlab --tags --force
