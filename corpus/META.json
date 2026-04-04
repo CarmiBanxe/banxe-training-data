@@ -1,10 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "512ada70bb3dc4b35aa133274016bc37cd60364e",
-  "source_message": "fix: disable CodeQL auto-triggers, switch to manual-only (workflow_dispatch)
-
-Removed automatic triggers for CodeQL analysis and added manual trigger support.",
-  "extracted_at": "2026-04-04T22:54:56Z",
+  "source_commit": "2af6c9f56eced09a376e0685ea6cb0a682f106a1",
+  "source_message": "remove: delete codeql.yml — replaced by Aider, no restoration",
+  "extracted_at": "2026-04-04T23:05:00Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
