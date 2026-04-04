@@ -205,4 +205,16 @@ ClickHouse:9000 → FCA audit trail         always
 - Секрет `TRAINING_DATA_TOKEN` установлен ✅ (fine-grained PAT от CarmiBanxe)
 - Corpus: A-compliance / B-architecture / C-scenarios / D-decisions / E-feedback
 - Триггер: push в main, кроме `auto: SYSTEM-STATE`
+- D-decisions экспорт: `scripts/backup-clickhouse-training.sh` — запускать ежемесячно на GMKtec
+  → экспортирует `banxe.audit_trail` → `docs/training-exports/decisions-YYYY-MM.jsonl`
+  → workflow подберёт при следующем push
 # workflow verified 2026-04-04T21:11:15Z
+
+## Developer Core (~/developer → main, 2026-04-05)
+
+- Репо: `CarmiBanxe/developer-core`, локально: `~/developer`
+- Ветка: `master` → `main` (переименована, master удалена)
+- ss1 добавлен в sync-targets (sync-to-project.sh + PROJECT-REGISTRY.csv)
+- collaboration → developer-core: слияние завершено (commit 27bf885)
+- PENDING (user browser action): архивировать `CarmiBanxe/collaboration` → Settings → Danger Zone → Archive
+- Замена CodeQL: `banxe-verification-tests.yml` (LangGraph cross-verification network, 5 категорий A-E)

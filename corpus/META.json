@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "41415a9a64468995e3bc33db9582ca8b65cc3016",
-  "source_message": "feat: add backup-clickhouse-training.sh — D-decisions export for training corpus",
-  "extracted_at": "2026-04-04T23:28:22Z",
+  "source_commit": "1c93a277f005c69df4c14dafbf9c5d6d58609409",
+  "source_message": "docs: update MEMORY.md — D-decisions script, developer-core branch unification",
+  "extracted_at": "2026-04-04T23:28:43Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
