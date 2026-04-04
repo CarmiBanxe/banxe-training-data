@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "a92a0c282f3831c63802fa766c539eb4a31f60e1",
-  "source_message": "docs: update MEMORY.md — verification bug fix, training CI, adversarial sim",
-  "extracted_at": "2026-04-04T23:48:08Z",
+  "source_commit": "67bf4dae2a974bf958fb3d6ca8fe3ad9c9426871",
+  "source_message": "feat: verify-statement skill — HTTP API wrapper for orchestrator (port 8091)",
+  "extracted_at": "2026-04-04T23:52:31Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
