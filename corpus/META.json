@@ -1,8 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "1c93a277f005c69df4c14dafbf9c5d6d58609409",
-  "source_message": "docs: update MEMORY.md — D-decisions script, developer-core branch unification",
-  "extracted_at": "2026-04-04T23:28:43Z",
+  "source_commit": "1972ea7588ab05303446419be585aba725190c44",
+  "source_message": "fix+feat: verification pipeline — PEP/EDD bug fix + training CI + adversarial sim
+
+- compliance_validator: add 'without EDD', 'PEP without', 'approve PEP without' to forbidden patterns
+  (FCA MLR 2017 §4 — EDD mandatory for PEPs; was incorrectly returning CONFIRMED)
+- training-quality-report.yml: GitHub Actions for deepeval metrics + evidently drift
+  (triggers on corpus push or weekly Monday 03:00 UTC)
+- run-adversarial-sim.sh: GMKtec cron script for LLM-based adversarial simulation
+  (needs Ollama qwen3-banxe-v2; saves results to docs/adversarial-results/)",
+  "extracted_at": "2026-04-04T23:47:30Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
