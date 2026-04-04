@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "33e02719d72b047fd3a7aa8251537c5eba2bf8f7",
-  "source_message": "fix: verify API port 8091→8094 (8091=HITL Dashboard, 8092=Guiyon bridge)",
-  "extracted_at": "2026-04-04T23:54:31Z",
+  "source_commit": "4061dbbc75de59d15efa7af92c315c6729c0316f",
+  "source_message": "docs: update MEMORY.md — verify API port 8094, adversarial sim cron",
+  "extracted_at": "2026-04-04T23:55:47Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
