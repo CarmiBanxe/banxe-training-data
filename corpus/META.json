@@ -1,8 +1,10 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "7784cdb723fe379f99651607d0fc2608defa8cf9",
-  "source_message": "test: re-trigger workflow — TRAINING_DATA_TOKEN updated with banxe-training-data access",
-  "extracted_at": "2026-04-04T21:11:29Z",
+  "source_commit": "512ada70bb3dc4b35aa133274016bc37cd60364e",
+  "source_message": "fix: disable CodeQL auto-triggers, switch to manual-only (workflow_dispatch)
+
+Removed automatic triggers for CodeQL analysis and added manual trigger support.",
+  "extracted_at": "2026-04-04T22:54:56Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
