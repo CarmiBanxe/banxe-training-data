@@ -206,6 +206,7 @@ ClickHouse:9000 → FCA audit trail         always
 - Corpus: A-compliance / B-architecture / C-scenarios / D-decisions / E-feedback
 - Триггер: push в main, кроме `auto: SYSTEM-STATE`
 - D-decisions экспорт: `scripts/backup-clickhouse-training.sh` — запускать ежемесячно на GMKtec
+- Adversarial sim: `scripts/run-adversarial-sim.sh` — cron на GMKtec, воскресенье 02:00
   → экспортирует `banxe.audit_trail` → `docs/training-exports/decisions-YYYY-MM.jsonl`
   → workflow подберёт при следующем push
 # workflow verified 2026-04-04T21:11:15Z
@@ -218,3 +219,6 @@ ClickHouse:9000 → FCA audit trail         always
 - collaboration → developer-core: слияние завершено (commit 27bf885)
 - PENDING (user browser action): архивировать `CarmiBanxe/collaboration` → Settings → Danger Zone → Archive
 - Замена CodeQL: `banxe-verification-tests.yml` (LangGraph cross-verification network, 5 категорий A-E)
+- Training CI: `training-quality-report.yml` (deepeval + evidently, еженедельно пн 03:00 UTC)
+- BUG FIX 2026-04-05: `without EDD` / `PEP without` добавлены в forbidden patterns compliance_validator
+  (было: "Approve PEP without EDD" → CONFIRMED; стало: → REFUTED confidence 1.0)
