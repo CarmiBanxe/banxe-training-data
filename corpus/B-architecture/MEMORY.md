@@ -222,3 +222,7 @@ ClickHouse:9000 → FCA audit trail         always
 - Training CI: `training-quality-report.yml` (deepeval + evidently, еженедельно пн 03:00 UTC)
 - BUG FIX 2026-04-05: `without EDD` / `PEP without` добавлены в forbidden patterns compliance_validator
   (было: "Approve PEP without EDD" → CONFIRMED; стало: → REFUTED confidence 1.0)
+- Verify API: `banxe-verify-api.service` → порт 8094 (8091=HITL, 8092=Guiyon bridge)
+  Skill: `workspace-moa/skills/verify-statement/SKILL.md`
+  SOUL.md обновлены: compliance + kyc агенты
+  Cron adversarial sim: /etc/cron.d/banxe-adversarial (вс 02:00)
