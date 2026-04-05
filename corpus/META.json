@@ -1,28 +1,24 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "e2f22f7a8eb86abc50ed2d72125b4b13f5584464",
-  "source_message": "fix: AML stack cleanup — backward-compat wrappers + api.py mapping
+  "source_commit": "6c6042da7f6d804266a5cdcaeb946ed7a47d4a3f",
+  "source_message": "feat: professional docs infrastructure — pyproject.toml, MkDocs, ADR, CHANGELOG, CI
 
-- sanctions_check.py: add check_sanctions() async wrapper → screen_entity()
-  (api.py callers unbroken; returns legacy dict format with sanctioned/hits/top_match)
-
-- crypto_aml.py: add check_wallet() async wrapper → analyse_chain()
-  (api.py callers unbroken; returns legacy dict format with risk_score/decision)
-
-- api.py: map TransactionRequest → TransactionInput before check_transaction();
-  add missing await; use req.from_name instead of tx["from"] (pre-existing bug);
-  import TransactionInput from models for the mapping
-
-- tx_monitor.py: remove duplicate local imports from check_transaction() body
-  (_THRESHOLD_* and AMLResult already imported at module level)
-
-- banxe_aml_orchestrator.py: fix smoke test Cat A expectation REJECT→SAR
-  (score=100 ≥ _THRESHOLD_SAR=85 → SAR is correct; test expectation was wrong)
-
-All 6/6 smoke tests pass. Gate Review: SAFE TO COMMIT.
+- pyproject.toml: unified manifest — [project] metadata, runtime deps, optional groups
+  (dev/docs/training), [tool.pytest] migrated from pytest.ini, ruff + mypy config
+- pytest.ini: deleted (settings moved to pyproject.toml [tool.pytest.ini_options])
+- mkdocs.yml: MkDocs Material theme (slate/deep-purple), mkdocstrings, nav for
+  compliance modules + ADR, markdown extensions (admonition, superfences, tabbed)
+- docs/index.md: project overview, quick-start, decision thresholds table, module map
+- docs/reference/index.md: full signal rules reference (tx/sanctions/crypto/customer)
+- docs/adr/0001: ADR — Moov Watchman over LexisNexis (Apache 2.0, /home/runner/work/_temp/592a30dd-20dc-44a0-88fc-1ea5c4626455.sh vs 00K+/yr)
+- docs/adr/0002: ADR — 3-layer Collective LexisNexis architecture (decision rationale)
+- docs/adr/template.md: standard ADR template for future decisions
+- CHANGELOG.md: v0.16.0 + v0.15.0 + v0.14.0 + v0.13.0 + v0.1.0 history
+- .github/workflows/docs.yml: MkDocs build CI (--strict, artifact upload, deploy commented)
+- .github/workflows/test-coverage.yml: pytest + coverage XML artifact + summary
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:01:23Z",
+  "extracted_at": "2026-04-05T01:17:43Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
