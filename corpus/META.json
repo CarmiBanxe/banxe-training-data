@@ -1,27 +1,13 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "bf168b3c609a530b20e90c33a45bf2d0811106ae",
-  "source_message": "feat(adapters): Commercial adapter stubs — Dow Jones / Sumsub / Chainalysis, 28 tests
+  "source_commit": "9af6018ab8aee73018d1e2fb361c8915322b586f",
+  "source_message": "chore(canon): add CANON v1.0 BANXE/DEV profile
 
-- dowjones_adapter.py: DowJonesAdapter (PEP/sanctions), ScreeningResult,
-  PEPResult (with relatives & associates); STUB mode raises NotConfiguredError
-  with vendor onboarding instructions; LIVE mode calls DJRC REST API;
-  to_risk_signal() maps hits to RiskSignal (authority: SAMLA 2018 / FCA MLR 2017)
-- sumsub_adapter.py: SumsubAdapter (KYC/KYB), VerificationResult, KYBResult;
-  HMAC-SHA256 signed requests; verify_document/verify_kyb/get_applicant_status;
-  REJECTED → requires_mlro=True; authority: FCA MLR 2017 §28
-- chainalysis_adapter.py: ChainalysisAdapter (crypto AML KYT), WalletRiskResult,
-  TransactionRiskResult; 0-10 risk score → SEVERE/HIGH/MEDIUM/LOW categories;
-  SEVERE + sanctions_exposure > 10% → requires_mlro=True;
-  authority: FCA Cryptoasset AML / FATF VASP Travel Rule
-- All adapters: from_env() config, NotConfiguredError with DOC/onboarding msg,
-  is_configured property, STUB/LIVE mode property
-- 28 tests covering STUB behaviour, config, to_risk_signal() mapping
-
-Full suite: 747/747 passed
+Synced from developer-core@97af4d2.
+Active profile: banxe (CORE+DOC+DEV+DECISION+rules).
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T21:56:00Z",
+  "extracted_at": "2026-04-05T23:08:10Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
