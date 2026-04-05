@@ -371,6 +371,44 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
   Promptfoo cron: /etc/cron.d/banxe-promptfoo-eval — воскресенье 04:00 (GAP 3, 2026-04-05)
   Cron adversarial sim: /etc/cron.d/banxe-adversarial (вс 02:00)
 
+## Архитектурный аудит v2 (2026-04-05)
+
+Проведён глубокий аудит по 10 классическим принципам + OpenClaw/multi-agent специфика.
+Полный реестр: `banxe-architecture/GAP-REGISTER.md` (15 пробелов, спринт-план).
+
+### Оценки по принципам
+| Принцип | Оценка | Главный gap |
+|---|---|---|
+| AI-Native / Deterministic Bridge | 7/10 | ExplanationBundle не реализован (G-02) |
+| Policy-as-Code | 8/10 | compliance_config.yaml не создан (G-07) |
+| CQRS + Event Sourcing | 4/10 | Нет Decision Event Log (G-01) |
+| HITL / EU AI Act Art.14 | 5/10 | Stop button partial, дедлайн 2026-08-02 (G-03) |
+| DDD / Bounded Contexts | 3/10 | Описан, не enforced в коде (G-06) |
+| Microservices / SoC | 6/10 | Process-level isolation только у Yente |
+| 12-Factor | 5/10 | Factor III нарушен (G-07) |
+| XAI | 0/10 | Полностью отсутствует (G-02) |
+| Multi-agent trust | 2/10 | Нет Orchestration Tree (G-04), нет Class B gate (G-05) |
+
+### Новые инварианты (I-21..I-25)
+Добавлены в `banxe-architecture/INVARIANTS.md`:
+- I-21: feedback_loop.py НИКОГДА не auto-патчит SOUL.md/AGENTS.md
+- I-22: Level-2 агент не пишет в policy layer
+- I-23: Emergency stop проверяется ДО любого автоматического решения
+- I-24: Decision Event Log = append-only (G-01, ещё не реализован)
+- I-25: ExplanationBundle обязателен для решений > £10K (G-02, ещё не реализован)
+
+### Governance документы созданы
+- `banxe-architecture/GAP-REGISTER.md` — реестр 15 пробелов + спринт-план
+- `banxe-architecture/governance/change-classes.yaml` — Class A/B/C/D с approval gates
+  - CLASS_B_SOUL_AGENTS: feedback_loop can_apply=NEVER, unanimous MLRO+CTO required
+
+### Sprint план (приоритет при возврате к коду)
+1. G-03 [PAUSED]: Завершить stop button — тесты + Marble UI + deploy (PRIORITY #1)
+2. G-05 [DONE-DOCS]: change-classes.yaml создан; CI enforcement в Sprint 3
+3. G-02: ExplanationBundle в risk_contract.py
+4. G-01: Decision Event Log PostgreSQL
+5. G-07: compliance_config.yaml
+
 ## Policy Provenance (2026-04-05)
 
 Единый контракт `policy_scope: dict[str, str]` на весь стек — ключи с `policy_` prefix:
