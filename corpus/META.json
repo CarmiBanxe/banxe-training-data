@@ -1,25 +1,27 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "e16a7f6b4af4c055b081b5ac444f4388bdd012b1",
-  "source_message": "feat(security): VaultCredentialStore — Vault KV v2 adapter with InMemory fallback, 28 tests
+  "source_commit": "bf168b3c609a530b20e90c33a45bf2d0811106ae",
+  "source_message": "feat(adapters): Commercial adapter stubs — Dow Jones / Sumsub / Chainalysis, 28 tests
 
-- vault_credential_store.py: VaultCredentialStore implements same interface as
-  InMemoryCredentialStore; VaultConfig (from_env(): VAULT_TOKEN/VAULT_ADDR/
-  VAULT_SECRET_ENGINE); _probe_vault() checks /v1/sys/health at startup;
-  fallback to InMemoryCredentialStore when Vault unreachable or token missing;
-  Vault KV v2 mapping: save→PUT, get→GET, revoke→mark revoked, purge→fallback
-- ZSP-01 enforcement preserved: all scope restrictions via JITCredentialManager
-  (Level-3 blocked from EMIT_DECISION/APPEND_AUDIT/CHECK_EMERGENCY/ORCHESTRATE)
-- get_credential_manager(prefer_vault=True): factory — selects Vault or InMemory
-  based on VAULT_TOKEN env + reachability; singleton; backward compatible
-- WARNING log when falling back to InMemory (StructuredLogger)
-- 28 tests: all run in fallback mode (no real Vault needed)
+- dowjones_adapter.py: DowJonesAdapter (PEP/sanctions), ScreeningResult,
+  PEPResult (with relatives & associates); STUB mode raises NotConfiguredError
+  with vendor onboarding instructions; LIVE mode calls DJRC REST API;
+  to_risk_signal() maps hits to RiskSignal (authority: SAMLA 2018 / FCA MLR 2017)
+- sumsub_adapter.py: SumsubAdapter (KYC/KYB), VerificationResult, KYBResult;
+  HMAC-SHA256 signed requests; verify_document/verify_kyb/get_applicant_status;
+  REJECTED → requires_mlro=True; authority: FCA MLR 2017 §28
+- chainalysis_adapter.py: ChainalysisAdapter (crypto AML KYT), WalletRiskResult,
+  TransactionRiskResult; 0-10 risk score → SEVERE/HIGH/MEDIUM/LOW categories;
+  SEVERE + sanctions_exposure > 10% → requires_mlro=True;
+  authority: FCA Cryptoasset AML / FATF VASP Travel Rule
+- All adapters: from_env() config, NotConfiguredError with DOC/onboarding msg,
+  is_configured property, STUB/LIVE mode property
+- 28 tests covering STUB behaviour, config, to_risk_signal() mapping
 
-Sprint 5 migration path from G-10: swap InMemoryCredentialStore → VaultCredentialStore
-via JITCredentialManager(store=VaultCredentialStore(config=...))
+Full suite: 747/747 passed
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T21:27:09Z",
+  "extracted_at": "2026-04-05T21:56:00Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
