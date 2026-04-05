@@ -111,7 +111,7 @@
 - DONE (2026-04-05): policy_scope: dict[str, str] → VerificationResult (developer-core 53770fc) + ConsensusResult → JSONL corpus
 - DONE (2026-04-05): policy_scope propagated → AMLResult + BanxeAMLResult → ClickHouse audit_trail (policy_jurisdiction/regulator/framework) (vibe-coding 4760b7d)
 - DONE (2026-04-05): train-agent.sh --force safety gate — BLOCKED если accuracy<85% или drift>0.15 (ADR-003) (45bb5ef)
-- PENDING: Опубликовать banxe-architecture → `bash scripts/publish-architecture-repo.sh` (после `! gh auth login`)
+- DONE (2026-04-05): banxe-architecture опубликован → https://github.com/CarmiBanxe/banxe-architecture (6a4da41)
 - PENDING: Задеплоить GAP 5 → `bash scripts/deploy-gap5-drift-monitor.sh`
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
 - PENDING: GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
@@ -235,7 +235,7 @@ ClickHouse:9000 → FCA audit trail         always
 
 ## Architecture Repository (2026-04-05)
 
-- Репо: `CarmiBanxe/banxe-architecture` (приватный, локально создан — публикация pending)
+- Репо: `CarmiBanxe/banxe-architecture` (приватный, **ОПУБЛИКОВАН 2026-04-05** → https://github.com/CarmiBanxe/banxe-architecture)
 - Назначение: единственный источник истины для архитектурных решений
 - Все проекты ОБЯЗАНЫ соответствовать
 - Структура: INVARIANTS.md (20 инвариантов), PRIVILEGE-MODEL.md, COMPLIANCE-ARCH.md, COMPOSABLE-ARCH.md (6 контуров), SANCTIONS-POLICY.md, STACK-LAYERS.md, SOUL-TEMPLATE.md, SERVICE-MAP.md, DEFERRED-PROJECTS.md, README.md
