@@ -103,7 +103,10 @@
 ## Задачи
 
 - DONE: Security hardening, GTT unlock (59392MB), ROCm, qwen3:30b-a3b, Sanctions policy, Verification env, SOUL.md deployment (chattr +i + soul-protected + SOUL GUARD в autosync)
+- DONE (2026-04-05): GAP 1 auto-verify skill, GAP 2 HITL bridge, GAP 3 promptfoo cron
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
+- PENDING (следующая сессия): verify-statement SKILL.md → workspace (добавить копирование в deploy-gap1 или deploy-backlog-phase16.sh)
+- PENDING (следующая сессия): GAP 4 feedback loop RAG, GAP 5 realtime drift 6ч, GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
   Thinking подавлено через пустой <think></think> в Modelfile + thinkingDefault:"off" в openclaw.json.
   Действие не требуется — механизм работает корректно.
