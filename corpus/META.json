@@ -1,13 +1,13 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "eb5d4c4f89e23c42c0697b46bc253acb82ed09b5",
-  "source_message": "fix(verify): remove pipes from check_remote commands (local shell expansion bug)
+  "source_commit": "cf965735557f894eb8bb7f6b5abda921ee2ee732",
+  "source_message": "fix(verify): use ssh remote "" instead of ssh remote bash -c ""
 
-ssh bash -c "" with pipe in  splits pipeline locally, not on remote.
-Fixed by using curl -sf exit code directly (0=success 2xx, non-0=error).
+bash -c "" treats each word as a separate argument breaking multi-word commands.
+ssh remote "" passes the full string to remote shell for correct execution.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T23:17:12Z",
+  "extracted_at": "2026-04-05T23:17:41Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
