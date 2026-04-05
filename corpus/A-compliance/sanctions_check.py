@@ -223,6 +223,38 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
     return signals
 
 
+# ── Backward-compat wrapper (api.py uses this name) ──────────────────────────
+
+async def check_sanctions(name: str, entity_type: str = "person") -> dict:
+    """
+    Legacy dict-return wrapper for api.py callers.
+    New code: use screen_entity(SanctionsSubject(...)) directly.
+    """
+    subject = SanctionsSubject(name, entity_type=entity_type)
+    signals = screen_entity(subject)
+    sanctioned = any(
+        s.rule in ("SANCTIONS_CONFIRMED", "SANCTIONS_PROBABLE", "SUBJECT_JURISDICTION_A")
+        for s in signals
+    )
+    # Extract best name match from reason field ("'...' (source...")
+    top_match = ""
+    for s in signals:
+        if "match" in s.reason and "'" in s.reason:
+            try:
+                top_match = s.reason.split("'")[1]
+                break
+            except IndexError:
+                pass
+    return {
+        "sanctioned":    sanctioned,
+        "hits":          [{"rule": s.rule, "reason": s.reason, "score": s.score} for s in signals],
+        "hit_count":     len(signals),
+        "lists_with_hits": sorted({s.rule for s in signals}),
+        "top_match":     top_match,
+        "sources_checked": ["watchman", "local_fuzzy"],
+    }
+
+
 # ── __main__ smoke tests ──────────────────────────────────────────────────────
 
 if __name__ == "__main__":

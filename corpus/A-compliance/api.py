@@ -26,11 +26,12 @@ sys.path.insert(0, BASE)
 
 from pep_check       import check_pep
 from adverse_media   import check_adverse_media
-from sanctions_check import check_sanctions
+from sanctions_check import check_sanctions        # backward-compat wrapper → screen_entity()
 from doc_verify      import verify_passport, verify_face
 from kyb_check       import check_company
-from crypto_aml      import check_wallet
-from tx_monitor      import check_transaction
+from crypto_aml      import check_wallet           # backward-compat wrapper → analyse_chain()
+from tx_monitor      import check_transaction      # backward-compat wrapper → score_transaction()
+from models          import TransactionInput        # for TransactionRequest mapping
 from sar_generator   import generate_sar
 from audit_trail     import log_screening, get_screening_history, get_stats, setup_schema
 try:
@@ -306,14 +307,21 @@ async def screen_wallet(req: WalletScreenRequest, background_tasks: BackgroundTa
 @app.post("/api/v1/transaction/check")
 async def transaction_check(req: TransactionRequest):
     """Real-time transaction monitoring rules (structuring, velocity, jurisdiction)."""
-    tx = req.model_dump()
-    tx["from"] = tx.pop("from_name", "")
-    tx["to"]   = tx.pop("to_name", "")
-    result = check_transaction(tx)
+    # Map Pydantic request → TransactionInput dataclass expected by tx_monitor
+    tx_input = TransactionInput(
+        origin_jurisdiction      = req.jurisdiction or "GB",
+        destination_jurisdiction = req.jurisdiction or "GB",
+        amount_gbp               = req.amount,   # api.py assumes GBP; multi-currency TBD
+        currency                 = req.currency,
+        sender_account           = req.from_account or "",
+        recipient_account        = req.to_account or "",
+        tx_type                  = req.tx_type,
+    )
+    result = await check_transaction(tx_input)
 
     # If flagged — also screen counterparties
     if result.get("flagged"):
-        sender_check = await check_sanctions(tx["from"])
+        sender_check = await check_sanctions(req.from_name)
         result["sender_sanctions"] = sender_check.get("sanctioned", False)
 
     return result

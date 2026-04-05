@@ -1,38 +1,28 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "2d6184f828754238e388edcfd11e2c80f734ff9a",
-  "source_message": "feat: BANXE AML block runtime — 3-layer collective LexisNexis stack
+  "source_commit": "e2f22f7a8eb86abc50ed2d72125b4b13f5584464",
+  "source_message": "fix: AML stack cleanup — backward-compat wrappers + api.py mapping
 
-Phase 3: tx_monitor.py — 9 rules, score_transaction() → list[RiskSignal],
-  imports thresholds/jurisdictions from compliance_validator (Layer 1),
-  Redis velocity, legacy check_transaction() backward-compat wrapper.
+- sanctions_check.py: add check_sanctions() async wrapper → screen_entity()
+  (api.py callers unbroken; returns legacy dict format with sanctioned/hits/top_match)
 
-Phase 4: sanctions_check.py — stdlib urllib (no httpx), difflib fallback,
-  SanctionsSubject input, list[RiskSignal] output, SANCTIONS_CONFIRMED/
-  PROBABLE/SUBJECT_JURISDICTION_A/B rules.
+- crypto_aml.py: add check_wallet() async wrapper → analyse_chain()
+  (api.py callers unbroken; returns legacy dict format with risk_score/decision)
 
-Phase 5: crypto_aml.py — stdlib urllib (no httpx, no FINOS OpenAML),
-  WalletScreeningInput input, list[RiskSignal] output, CRYPTO_SANCTIONS/
-  CRITICAL/HIGH_RISK/ELEVATED/HIGH_VALUE rules.
+- api.py: map TransactionRequest → TransactionInput before check_transaction();
+  add missing await; use req.from_name instead of tx["from"] (pre-existing bug);
+  import TransactionInput from models for the mapping
 
-Phase 2: models.py — shared data contracts: TransactionInput,
-  SanctionsSubject, WalletScreeningInput, CustomerProfile,
-  RiskSignal, AMLResult.
+- tx_monitor.py: remove duplicate local imports from check_transaction() body
+  (_THRESHOLD_* and AMLResult already imported at module level)
 
-Phase 6: aml_orchestrator.py — generic Layer 2 aggregator,
-  assess(tx, subject, wallet) → AMLResult, hard override rules.
+- banxe_aml_orchestrator.py: fix smoke test Cat A expectation REJECT→SAR
+  (score=100 ≥ _THRESHOLD_SAR=85 → SAR is correct; test expectation was wrong)
 
-Phase 3b: banxe_aml_orchestrator.py — Layer 3 BANXE runtime,
-  banxe_assess(transaction, customer, counterparty, wallet, channel)
-  → BanxeAMLResult with case_id, policy_version, signal-priority
-  decision engine (hard overrides + high-risk floor), to_api_response()
-  and to_audit_dict() for ClickHouse insert.
-
-Phase 7: COMPLIANCE_ARCH.md — Phase 16, 3-layer ASCII diagram,
-  directory layout, example flow, signal-priority vs pure summation table.
+All 6/6 smoke tests pass. Gate Review: SAFE TO COMMIT.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T00:46:12Z",
+  "extracted_at": "2026-04-05T01:01:23Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

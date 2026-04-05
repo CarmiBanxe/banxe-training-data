@@ -207,6 +207,40 @@ def analyse_chain(wallet: WalletScreeningInput) -> list[RiskSignal]:
     return signals
 
 
+# ── Backward-compat wrapper (api.py uses this name) ──────────────────────────
+
+async def check_wallet(address: str, chain: str = "eth",
+                       risk_flags: list[str] | None = None,
+                       tx_value_usd: float = 0.0) -> dict:
+    """
+    Legacy dict-return wrapper for api.py callers.
+    New code: use analyse_chain(WalletScreeningInput(...)) directly.
+    """
+    wallet = WalletScreeningInput(
+        address=address,
+        chain=chain,
+        risk_flags=risk_flags or [],
+        tx_value_usd=tx_value_usd,
+    )
+    signals = analyse_chain(wallet)
+    score    = min(sum(s.score for s in signals), 100)
+    decision = ("BLOCK" if score >= _THRESHOLD_REJECT else
+                "HOLD"  if score >= _THRESHOLD_HOLD   else "APPROVE")
+    return {
+        "address":        address,
+        "chain":          chain,
+        "sanctioned":     any(s.rule == "CRYPTO_SANCTIONS" for s in signals),
+        "risk_score":     score,
+        "risk_level":     ("CRITICAL" if score >= 90 else
+                           "HIGH"     if score >= _THRESHOLD_REJECT else
+                           "MEDIUM"   if score >= _THRESHOLD_HOLD   else "LOW"),
+        "risk_factors":   [s.reason for s in signals],
+        "decision":       decision,
+        "sources_checked": ["watchman_ofac", "heuristic"],
+        "cluster_info":   {"rules": sorted(s.rule for s in signals)},
+    }
+
+
 # ── __main__ smoke tests ──────────────────────────────────────────────────────
 
 if __name__ == "__main__":
