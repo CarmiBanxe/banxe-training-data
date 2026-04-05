@@ -1,32 +1,42 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "da0b53bc804989a44904d5cd9a3891d23b1b94e0",
-  "source_message": "feat(g02): ExplanationBundle — deterministic XAI, FCA SS1/23, I-25
+  "source_commit": "d7a13105db0c3b6fbcca5bbcc31e447bc5b29455",
+  "source_message": "feat(g07): Externalize AML thresholds — 12-Factor Factor III
 
-New: utils/explanation_builder.py
-  - ExplanationBundle dataclass (decision, top_factors, narrative,
-    confidence=0.95, method="rule-based", counterfactual)
-  - CounterfactualExplanation dataclass (threshold arithmetic, no ML)
-  - ExplanationBundle.from_banxe_result() factory — deterministic,
-    built from RiskSignal metadata
-  - to_dict() — JSON-serialisable (tuples → lists)
-  - _build_narrative(): MLRO-readable narrative per decision type
-    (APPROVE / HOLD / REJECT / SAR / hard_override / high_risk_floor)
-  - _build_counterfactual(): HOLD→APPROVE, REJECT→HOLD, SAR→REJECT
+New: compliance_config.yaml
+  Single source of truth for all policy values:
+  - decision_thresholds: SAR=85, REJECT=70, HOLD=40
+  - watchman/yente min_match=0.80
+  - jurisdictions: hard_block (11 Cat A), high_risk (6 Cat B)
+  - transaction_monitoring: mlr_reporting_threshold_gbp=10000
+  - forbidden_patterns: 17 regex red-lines
+  - policy: version, jurisdiction, audit_ttl_years
+  Override: COMPLIANCE_CONFIG_PATH env var
 
-Modified: banxe_aml_orchestrator.py
-  - BanxeAMLResult.explanation field (Optional[ExplanationBundle])
-  - banxe_assess(): builds explanation after every decision (I-25)
-  - to_api_response(): includes explanation.to_dict() if present
+New: utils/config_loader.py
+  Typed loader (lru_cache) with typed getters per value.
+  reload_config() clears cache for test isolation.
 
-New: test_explanation_bundle.py — 24 tests (T-01..T-24)
-  All 96/96 tests pass (24 new + 57 phase15 + 15 decision_event_log)
+Modified: verification/compliance_validator.py
+  Replaces 7 hardcoded constants with config_loader calls.
+  Module-level names preserved — zero changes needed in 6 importers.
 
-Closes: GAP-REGISTER G-02
-Invariant: I-25 — ExplanationBundle required for tx >= £10,000
+Modified: utils/explanation_builder.py
+  Removes local threshold copies (85/70/40) → config_loader.
+
+Modified: sanctions_check.py
+  WATCHMAN_MIN_MATCH + YENTE_MIN_SCORE → config_loader.
+
+Modified: tx_monitor.py
+  _MLR_REPORTING_THRESHOLD_GBP → config_loader.
+
+New: test_config_loader.py — 18 tests (T-01..T-18)
+  All 114/114 tests pass.
+
+Closes: GAP-REGISTER G-07 (12-Factor Factor III)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T16:30:06Z",
+  "extracted_at": "2026-04-05T16:40:21Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

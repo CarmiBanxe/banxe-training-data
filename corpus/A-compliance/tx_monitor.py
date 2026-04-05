@@ -38,6 +38,7 @@ from compliance.verification.compliance_validator import (
     _THRESHOLD_REJECT,
     _THRESHOLD_HOLD,
 )
+from compliance.utils.config_loader import get_mlr_reporting_threshold_gbp
 
 # Redis for velocity counters (optional — graceful fallback if unavailable)
 try:
@@ -52,7 +53,7 @@ REDIS_URL = "redis://127.0.0.1:6379"
 # These are operational parameters for rule windows, NOT compliance thresholds.
 # Compliance thresholds are imported above from compliance_validator.
 
-_MLR_REPORTING_THRESHOLD_GBP = 10_000   # MLR 2017 single-tx reporting threshold
+_MLR_REPORTING_THRESHOLD_GBP = get_mlr_reporting_threshold_gbp()  # from compliance_config.yaml
 _STRUCTURING_WINDOW_SEC      = 86_400   # 24h structuring detection window
 _STRUCTURING_MIN_TX          = 3        # min transactions to trigger structuring flag
 _VELOCITY_WINDOW_SEC         = 86_400   # 24h velocity window

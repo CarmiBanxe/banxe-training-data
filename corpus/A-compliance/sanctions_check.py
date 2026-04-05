@@ -30,6 +30,7 @@ from compliance.verification.compliance_validator import (
     _HARD_BLOCK_JURISDICTIONS,
     _HIGH_RISK_JURISDICTIONS,
 )
+from compliance.utils.config_loader import get_watchman_min_match, get_yente_min_score
 from compliance.utils.structured_logger import get_logger
 
 _log = get_logger("sanctions_check")
@@ -37,10 +38,10 @@ _log = get_logger("sanctions_check")
 # ── ADR-009: Yente (OpenSanctions) primary — Watchman fallback ───────────────
 YENTE_URL          = "http://127.0.0.1:8086"   # Phase 3; port per SERVICE-MAP.md
 YENTE_TIMEOUT      = 8    # seconds; Yente index queries can be slower than Watchman
-YENTE_MIN_SCORE    = 0.80 # matches WATCHMAN_MIN_MATCH for consistent thresholds
+YENTE_MIN_SCORE    = get_yente_min_score()     # from compliance_config.yaml
 
 WATCHMAN_URL       = "http://127.0.0.1:8084"
-WATCHMAN_MIN_MATCH = 0.80
+WATCHMAN_MIN_MATCH = get_watchman_min_match()  # from compliance_config.yaml
 WATCHMAN_TIMEOUT   = 5    # seconds
 
 # Entity-type → Yente FtM schema mapping
