@@ -1,15 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "bab1ec98521aa17960fbe8524a5a589df12a81e3",
-  "source_message": "wip: emergency stop endpoint — paused, syntax OK, tests pending
-
-DONE: emergency_stop.py + api.py (d5c1007) — syntax check passed
-DONE: sanctions_check ADR-009 routing (119c357)
-DONE: scenario_registry engines bindings (38637ec)
-PAUSED #1: stop button integration tests + Marble UI + production deploy
-PAUSED: ExplanationBundle, compliance_config.yaml, Bounded Context
-MEMORY.md updated with full paused/done state.",
-  "extracted_at": "2026-04-05T13:32:21Z",
+  "source_commit": "1fc7046ede50da2756b032719560a1535094c230",
+  "source_message": "docs: MEMORY.md — архитектурный аудит v2, gap register, sprint план",
+  "extracted_at": "2026-04-05T13:41:37Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
