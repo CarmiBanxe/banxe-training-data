@@ -1,20 +1,17 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "4760b7d1f2d14654a4e2f9148b3f0dc17004c040",
-  "source_message": "feat(compliance): add policy_scope to AMLResult and BanxeAMLResult
+  "source_commit": "45bb5ef6d33a04066c8c438b303f0ae4b25ca729",
+  "source_message": "feat(training): add --force safety gate to train-agent.sh
 
-- models.py: AMLResult.policy_scope: dict[str, str] with default
-  {policy_jurisdiction, policy_regulator, policy_framework}; **self.policy_scope
-  in to_audit_dict() → ClickHouse gets all three provenance columns
-- banxe_aml_orchestrator.py: BanxeAMLResult.policy_scope mirroring POLICY_*
-  constants; populated in banxe_assess() and expanded in to_audit_dict()
-
-Closes the last mile: policy provenance now flows
-compliance_validator → orchestrator → AMLResult → ClickHouse audit_trail.
-Per ADR-008: single policy_scope contract across the full stack.
+- FLAG_FORCE=false default added to Defaults section
+- Deploy safety gate (ADR-003): blocks --deploy when accuracy < 85%
+  or avg_drift > 0.15; --force cannot override failed metrics
+- When metrics pass + no --force: shows feedback_loop --report preview
+  then waits for interactive [y/N] before deploying to GMKtec
+- --force skips interactive prompt only when metrics pass (CI/CD use)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T12:01:33Z",
+  "extracted_at": "2026-04-05T12:08:46Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
