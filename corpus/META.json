@@ -1,14 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "b1d6246ff9c7595d580d3ca555aee06663f00234",
-  "source_message": "feat(gap2): HITL bridge — Marble + Telegram on verification REFUTED/UNCERTAIN
+  "source_commit": "3cefd133c9a3d95b20c1d3f28b62da76fa93121a",
+  "source_message": "feat(gap3): promptfoo eval cron — qwen3-banxe-v2, Sunday 04:00, Telegram alert
 
-- scripts/hitl-bridge.sh: creates Marble case (port 5002) + sends Telegram
-  notification; graceful degradation if either service unavailable
-- docs/MEMORY.md: HITL Bridge section with ports, env vars, log path
+- scripts/run-promptfoo-eval.sh: full eval pipeline (model check → eval →
+  parse results → Telegram alert if fail>20% → git push results)
+- scripts/deploy-gap3-promptfoo.sh: installs cron on GMKtec + YAML validation
+- docs/MEMORY.md: Promptfoo eval cron section
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T02:14:49Z",
+  "extracted_at": "2026-04-05T02:21:51Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
