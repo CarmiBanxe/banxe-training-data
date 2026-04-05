@@ -1,22 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "d0a6ddc27088606eb1e7370f37ab592b98e41d8d",
-  "source_message": "feat(review): G-15 Multi-Agent Review Pattern — Plan>Build>Review, 28 tests
+  "source_commit": "3ada0c49a54b100ba69948789e27921d9a94b0ea",
+  "source_message": "feat(gates): G-09 Redis Pre-Transaction Gate — fast-path <80ms, 28 tests
 
-- review/review_agent.py: ReviewAgent independent rule-based reviewer;
-  ReviewRequest (proposed_change, change_class, author_agent_id, target_file,
-  rationale, author_level), ReviewResult (approved, reviewer_agent_id, concerns,
-  risk_score, recommendation, resolved_class)
-- Decision logic: CLASS_B→REJECT(100), CLASS_C→ESCALATE_TO_HUMAN(75),
-  CLASS_D→REJECT(100), CLASS_A→rule-based (I-21 +90, I-22 +85, trust-zone +70,
-  BC-boundary +20/25, no-rationale +10); risk>80→REJECT, risk>50→ESCALATE
-- Auto-detects change class from target_file path/name (SOUL.md→B, *.rego→C, ADR-→D)
-- All decisions logged via StructuredLogger.event() (I-24 audit append-only)
-- review/__init__.py: package exports
-- Integration: feedback_loop.py calls ReviewAgent.review(request) before apply
+- pre_tx_gate.py: PreTxGate with 4 ordered checks against Redis:
+  1. EMERGENCY_STOP (banxe:emergency_stop KEY) → BLOCK
+  2. JURISDICTION (banxe:blocked_jurisdictions SET) → BLOCK (SAMLA 2018)
+  3. SANCTIONS_CACHE (banxe:sanctions_hits SET) → BLOCK
+  4. VELOCITY (banxe:velocity:{customer_id} ZSET, 24h/£25K) → ESCALATE
+- GateDecision frozen dataclass: PASS/BLOCK/ESCALATE + rule_id + latency_ms
+- InMemoryRedisStub: thread-safe, implements full Redis subset for unit tests
+- Fail-open: Redis unavailable → ESCALATE (never blocks business)
+- SLA: logs WARNING if total latency >80ms
+- sync_blocked_jurisdictions(): loads from compliance_config.yaml into Redis SET
+- sync_sanctions_cache(): populates confirmed hits into Redis SET
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T20:54:09Z",
+  "extracted_at": "2026-04-05T21:17:00Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
