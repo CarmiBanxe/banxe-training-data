@@ -1,22 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "b0a68d85abc5d99fcc8fbc5a6a7c5c80427ef191",
-  "source_message": "feat(security): G-14 OPA Sidecar Pilot — runtime pre-decision enforcement, 28 tests
+  "source_commit": "d0a6ddc27088606eb1e7370f37ab592b98e41d8d",
+  "source_message": "feat(review): G-15 Multi-Agent Review Pattern — Plan>Build>Review, 28 tests
 
-- opa_sidecar.py: OPASidecar wraps rego_evaluator.evaluate() as runtime layer
-  before agent decisions; enforces 3 critical rules:
-  RULE-01 (I-22) Level-2/3 no policy layer write → DENY
-  RULE-02 (I-23) emergency stop must be checked → DENY
-  RULE-03 (I-25) ExplanationBundle required >£10K → ESCALATE(MLRO)
-- PolicyDecision frozen dataclass: allowed, outcome(ALLOW/DENY/ESCALATE),
-  rule_id, reason, escalation_target, violations
-- Fail-closed: any internal exception → DENY with rule_id=SIDECAR_ERROR
-- All evaluations logged via StructuredLogger.event() (I-24 audit trail)
-- get_sidecar() module-level singleton
-- Integration point: call before banxe_aml_orchestrator._layer2_assess()
+- review/review_agent.py: ReviewAgent independent rule-based reviewer;
+  ReviewRequest (proposed_change, change_class, author_agent_id, target_file,
+  rationale, author_level), ReviewResult (approved, reviewer_agent_id, concerns,
+  risk_score, recommendation, resolved_class)
+- Decision logic: CLASS_B→REJECT(100), CLASS_C→ESCALATE_TO_HUMAN(75),
+  CLASS_D→REJECT(100), CLASS_A→rule-based (I-21 +90, I-22 +85, trust-zone +70,
+  BC-boundary +20/25, no-rationale +10); risk>80→REJECT, risk>50→ESCALATE
+- Auto-detects change class from target_file path/name (SOUL.md→B, *.rego→C, ADR-→D)
+- All decisions logged via StructuredLogger.event() (I-24 audit append-only)
+- review/__init__.py: package exports
+- Integration: feedback_loop.py calls ReviewAgent.review(request) before apply
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T20:44:25Z",
+  "extracted_at": "2026-04-05T20:54:09Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
