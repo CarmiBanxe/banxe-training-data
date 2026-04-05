@@ -104,7 +104,7 @@
 
 - DONE: Security hardening, GTT unlock (59392MB), ROCm, qwen3:30b-a3b, Sanctions policy, Verification env, SOUL.md deployment (chattr +i + soul-protected + SOUL GUARD в autosync)
 - DONE (2026-04-05): GAP 1 auto-verify skill, GAP 2 HITL bridge, GAP 3 promptfoo cron
-- DONE (2026-04-05): GAP 4 scenarios bank (160+ сценариев) + feedback_loop.py + train-agent.sh
+- DONE (2026-04-05): GAP 4 scenarios bank + feedback_loop.py + train-agent.sh --deploy (полный автоматический pipeline)
 - DONE (2026-04-05): GAP 5 drift monitoring cron (6ч) + deploy-gap5-drift-monitor.sh
 - DONE (2026-04-05): banxe-architecture репо (локально) + publish-architecture-repo.sh
 - DONE (2026-04-05): verify-statement/SKILL.md добавлен в deploy-gap1-auto-verify.sh [2/5]
@@ -267,6 +267,29 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
 - Отчёты: `/data/banxe/promptfoo/compliance/training/drift-reports/`
 - latest: `drift_latest.json`
 - Деплой: `bash scripts/deploy-gap5-drift-monitor.sh`
+
+## Auto-Deploy Pipeline (--deploy, 2026-04-05)
+
+`train-agent.sh --deploy` теперь **полностью автоматический**:
+
+```
+Шаг [1/4] прогон сценариев → corpus JSONL
+Шаг [2/4] метрики + report
+Шаг [3/4] feedback_loop.py --apply:
+           compliance_validator.py → developer-core git push
+           SOUL.md + AGENTS.md    → vibe-coding git push
+Шаг [4/4] check-compliance.sh → если PASS:
+           ssh gmktec git pull
+           protect-soul.sh update (SOUL.md chattr+i)
+           cp AGENTS.md → оба workspace
+           → "AUTO-DEPLOY: SOUL.md + AGENTS.md → GMKtec OK"
+           если FAIL → BLOCKED, exit 1
+```
+
+- AGENTS.md canonical: `vibe-coding/agents/workspace-moa/AGENTS.md`
+- apply_agents_patches() пишет в локальный файл (раньше только print)
+- commit_vibe_changes(): коммитит SOUL.md + AGENTS.md в vibe-coding
+- Validator: `~/banxe-architecture/validators/check-compliance.sh`
 
 ## Agent Training System (GAP 4, 2026-04-05)
 

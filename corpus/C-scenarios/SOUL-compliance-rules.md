@@ -1,4 +1,5 @@
 /no_think
+jurisdiction: UK  # FCA EMI scope — все правила ниже для UK юрисдикции
 
 # Banxe AI Bank — Compliance Rules
 
