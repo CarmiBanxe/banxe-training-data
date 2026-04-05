@@ -1,20 +1,32 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "9f68aa479389138e5cd48326006d0138ca886ba0",
-  "source_message": "feat(g01): deploy-decision-event-log.sh — production migration script
+  "source_commit": "da0b53bc804989a44904d5cd9a3891d23b1b94e0",
+  "source_message": "feat(g02): ExplanationBundle — deterministic XAI, FCA SS1/23, I-25
 
-6-step idempotent deploy for GMKtec:
-1. git pull sync
-2. PostgreSQL / banxe_compliance DB check (auto-create if missing)
-3. decision_events.sql migration (IF NOT EXISTS — safe re-run)
-4. I-24 verification: INSERT+SELECT granted, UPDATE+DELETE revoked at DB level
-5. Python smoke test: PostgresEventLogAdapter insert → query → idempotency
-6. Summary with next step hint for G-02 ExplanationBundle
+New: utils/explanation_builder.py
+  - ExplanationBundle dataclass (decision, top_factors, narrative,
+    confidence=0.95, method="rule-based", counterfactual)
+  - CounterfactualExplanation dataclass (threshold arithmetic, no ML)
+  - ExplanationBundle.from_banxe_result() factory — deterministic,
+    built from RiskSignal metadata
+  - to_dict() — JSON-serialisable (tuples → lists)
+  - _build_narrative(): MLRO-readable narrative per decision type
+    (APPROVE / HOLD / REJECT / SAR / hard_override / high_risk_floor)
+  - _build_counterfactual(): HOLD→APPROVE, REJECT→HOLD, SAR→REJECT
 
-Run: cd ~/vibe-coding && git pull && bash scripts/deploy-decision-event-log.sh
+Modified: banxe_aml_orchestrator.py
+  - BanxeAMLResult.explanation field (Optional[ExplanationBundle])
+  - banxe_assess(): builds explanation after every decision (I-25)
+  - to_api_response(): includes explanation.to_dict() if present
+
+New: test_explanation_bundle.py — 24 tests (T-01..T-24)
+  All 96/96 tests pass (24 new + 57 phase15 + 15 decision_event_log)
+
+Closes: GAP-REGISTER G-02
+Invariant: I-25 — ExplanationBundle required for tx >= £10,000
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T16:09:27Z",
+  "extracted_at": "2026-04-05T16:30:06Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
