@@ -108,6 +108,9 @@
 - DONE (2026-04-05): GAP 5 drift monitoring cron (6ч) + deploy-gap5-drift-monitor.sh
 - DONE (2026-04-05): banxe-architecture репо (локально) + publish-architecture-repo.sh
 - DONE (2026-04-05): verify-statement/SKILL.md добавлен в deploy-gap1-auto-verify.sh [2/5]
+- DONE (2026-04-05): policy_scope: dict[str, str] → VerificationResult (developer-core 53770fc) + ConsensusResult → JSONL corpus
+- DONE (2026-04-05): policy_scope propagated → AMLResult + BanxeAMLResult → ClickHouse audit_trail (policy_jurisdiction/regulator/framework) (vibe-coding 4760b7d)
+- DONE (2026-04-05): train-agent.sh --force safety gate — BLOCKED если accuracy<85% или drift>0.15 (ADR-003) (45bb5ef)
 - PENDING: Опубликовать banxe-architecture → `bash scripts/publish-architecture-repo.sh` (после `! gh auth login`)
 - PENDING: Задеплоить GAP 5 → `bash scripts/deploy-gap5-drift-monitor.sh`
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
@@ -232,10 +235,17 @@ ClickHouse:9000 → FCA audit trail         always
 
 ## Architecture Repository (2026-04-05)
 
-- Репо: `CarmiBanxe/banxe-architecture` (приватный)
+- Репо: `CarmiBanxe/banxe-architecture` (приватный, локально создан — публикация pending)
 - Назначение: единственный источник истины для архитектурных решений
 - Все проекты ОБЯЗАНЫ соответствовать
-- Структура: INVARIANTS.md, PRIVILEGE-MODEL.md, COMPLIANCE-ARCH.md, SANCTIONS-POLICY.md, STACK-LAYERS.md, SOUL-TEMPLATE.md, SERVICE-MAP.md, DEFERRED-PROJECTS.md, decisions/ (3 ADR), validators/check-compliance.sh
+- Структура: INVARIANTS.md (20 инвариантов), PRIVILEGE-MODEL.md, COMPLIANCE-ARCH.md, COMPOSABLE-ARCH.md (6 контуров), SANCTIONS-POLICY.md, STACK-LAYERS.md, SOUL-TEMPLATE.md, SERVICE-MAP.md, DEFERRED-PROJECTS.md, README.md
+- ADR-004: Jube AGPLv3 boundary (internal only)
+- ADR-005: Marble ELv2 boundary (internal only)
+- ADR-006: EvidenceBundle dataclass (SAR evidence pack, FCA MLR 2017 §20)
+- ADR-008: Jurisdiction label — `_POLICY_JURISDICTION/REGULATOR/FRAMEWORK` prefix (не путать с origin/residence/counterparty)
+- ADR-009: OpenSanctions/Yente — MIT, Phase 3, порт :8086, Watchman → fallback
+- ADR-010: AMLTRIX taxonomy — Apache 2.0, scenario_registry.yaml как version pin
+- ADR-011: Reference vs Dependency (Jube/Tazama/AMLTRIX = reference; Marble/Watchman/Yente = replaceable; validators+feedback_loop = core)
 - Проверка проекта: `bash validators/check-compliance.sh ~/vibe-coding`
 - Публикация: `bash scripts/publish-architecture-repo.sh` (после `gh auth login`)
 
@@ -353,3 +363,22 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
   HITL Bridge: scripts/hitl-bridge.sh → Marble :5002 + Telegram (GAP 2, 2026-04-05)
   Promptfoo cron: /etc/cron.d/banxe-promptfoo-eval — воскресенье 04:00 (GAP 3, 2026-04-05)
   Cron adversarial sim: /etc/cron.d/banxe-adversarial (вс 02:00)
+
+## Policy Provenance (2026-04-05)
+
+Единый контракт `policy_scope: dict[str, str]` на весь стек — ключи с `policy_` prefix:
+
+```
+compliance_validator.py (_POLICY_JURISDICTION/REGULATOR/FRAMEWORK)
+  → VerificationResult.policy_scope {"jurisdiction","regulator","framework"}
+  → ConsensusResult.policy_scope = cv.policy_scope → JSONL corpus (developer-core 53770fc)
+
+banxe_aml_orchestrator.py (POLICY_JURISDICTION/REGULATOR/FRAMEWORK)
+  → AMLResult.policy_scope {"policy_jurisdiction","policy_regulator","policy_framework"}
+  → BanxeAMLResult.policy_scope → to_audit_dict() → **self.policy_scope
+  → ClickHouse audit_trail: policy_jurisdiction="UK", policy_regulator="FCA", policy_framework="MLR 2017" (vibe-coding 4760b7d)
+```
+
+- Ключи в AML слое с `policy_` prefix чтобы не конфликтовать с origin_jurisdiction, residence_jurisdiction
+- Ключи в verification слое без prefix — для читаемости JSONL corpus
+- При multi-jurisdiction (EU/UAE): только поменять значение dict, нулевой рефакторинг (ADR-008)
