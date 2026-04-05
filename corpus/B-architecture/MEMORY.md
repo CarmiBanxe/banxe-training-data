@@ -61,7 +61,7 @@
 ## SOUL.md Protection (IMPLEMENTED 2026-04-04)
 
 - **Проблема**: OpenClaw перезаписывал `/root/.openclaw-moa/workspace-moa/SOUL.md` при рестарте
-- **Canonical source**: `/root/.openclaw-moa/soul-protected/SOUL.md` (3086 bytes, compliance version)
+- **Canonical source**: `/home/mmber/.openclaw-moa/soul-protected/SOUL.md` (user-owned, writable by mmber)
 - **Защита Уровень 1**: `chattr +i` на обоих workspace SOUL.md (root + mmber)
 - **Защита Уровень 2**: SOUL GUARD в memory-autosync-watcher.sh — hash-check + авторестор каждые 5 мин
 - **Управление**: `scripts/protect-soul.sh` (deploy / update / unlock / status)

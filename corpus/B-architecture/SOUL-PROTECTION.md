@@ -29,10 +29,11 @@
 ### Уровень 2 — Canonical Source of Truth
 
 ```
-/root/.openclaw-moa/soul-protected/SOUL.md  ← единственный источник истины
+/home/mmber/.openclaw-moa/soul-protected/SOUL.md  ← единственный источник истины
 ```
 
 Файл не immutable — он редактируемый, это сознательно. Именно с него делаются все обновления.
+Путь user-owned (`mmber`) — доступен для записи без sudo. Cron (root) читает его без проблем.
 
 ### Уровень 3 — Runtime Self-Healing (SOUL GUARD)
 
@@ -57,8 +58,8 @@
 
 | Файл | chattr +i | Размер | Источник |
 |------|-----------|--------|----------|
-| `/root/.openclaw-moa/soul-protected/SOUL.md` | нет (mutable) | 3086 bytes | canonical |
-| `/root/.openclaw-moa/workspace-moa/SOUL.md` | **да** | 3086 bytes | из soul-protected |
+| `/home/mmber/.openclaw-moa/soul-protected/SOUL.md` | нет (mutable, user-owned) | — bytes | canonical |
+| `/root/.openclaw-moa/workspace-moa/SOUL.md` | **да** | — bytes | из soul-protected |
 | `/home/mmber/.openclaw/workspace-moa/SOUL.md` | **да** | 3086 bytes | из soul-protected |
 
 Содержимое SOUL.md: compliance version с `/no_think`, Quick ACK, Compliance API calls, Sanctions thresholds.
