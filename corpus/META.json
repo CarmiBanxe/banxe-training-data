@@ -1,15 +1,16 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "c58c9957fd77c90bebf75d1e51610571b85e3330",
-  "source_message": "docs: MEMORY.md — close Marble TODO, mark think:false as verified
+  "source_commit": "f2025f0359ad52b2c23eea873a79dccd1744b812",
+  "source_message": "feat(gap1): auto-verify skill + SOUL.md step 3 + deploy script
 
-- Marble skill: TODO → DONE (workspace-moa/skills/marble-cases/SKILL.md created)
-- think:false: КРИТИЧНО → verified (2026-04-05):
-  OpenClaw sends only num_ctx+streaming via params;
-  thinking suppressed via Modelfile <think></think> + thinkingDefault:"off"
+- workspace-moa/skills/auto-verify/SKILL.md: full decision tree
+  (CONFIRMED/REFUTED/UNCERTAIN+hitl/timeout), Marble case creation on HITL,
+  correction field sourcing on REFUTED
+- docs/SOUL.md: add Step 3 mandatory auto-verify for compliance/kyc/aml/risk/crypto
+- scripts/deploy-gap1-auto-verify.sh: deploys skill + AGENTS.md rule + SOUL.md to GMKtec
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:42:06Z",
+  "extracted_at": "2026-04-05T02:13:34Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
