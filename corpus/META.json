@@ -1,24 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "6c6042da7f6d804266a5cdcaeb946ed7a47d4a3f",
-  "source_message": "feat: professional docs infrastructure — pyproject.toml, MkDocs, ADR, CHANGELOG, CI
+  "source_commit": "da5d740b41878ffe49033e1cc276c259b268aafb",
+  "source_message": "feat: automated quality monitoring — cron scripts, LLM-as-judge, drift detection
 
-- pyproject.toml: unified manifest — [project] metadata, runtime deps, optional groups
-  (dev/docs/training), [tool.pytest] migrated from pytest.ini, ruff + mypy config
-- pytest.ini: deleted (settings moved to pyproject.toml [tool.pytest.ini_options])
-- mkdocs.yml: MkDocs Material theme (slate/deep-purple), mkdocstrings, nav for
-  compliance modules + ADR, markdown extensions (admonition, superfences, tabbed)
-- docs/index.md: project overview, quick-start, decision thresholds table, module map
-- docs/reference/index.md: full signal rules reference (tx/sanctions/crypto/customer)
-- docs/adr/0001: ADR — Moov Watchman over LexisNexis (Apache 2.0, /home/runner/work/_temp/592a30dd-20dc-44a0-88fc-1ea5c4626455.sh vs 00K+/yr)
-- docs/adr/0002: ADR — 3-layer Collective LexisNexis architecture (decision rationale)
-- docs/adr/template.md: standard ADR template for future decisions
-- CHANGELOG.md: v0.16.0 + v0.15.0 + v0.14.0 + v0.13.0 + v0.1.0 history
-- .github/workflows/docs.yml: MkDocs build CI (--strict, artifact upload, deploy commented)
-- .github/workflows/test-coverage.yml: pytest + coverage XML artifact + summary
+- scripts/cron-adversarial-sim.sh: cron wrapper for adversarial_sim.py (every 6h
+  or weekly Sunday 02:00); logs to logs/adversarial-DATE.jsonl + error log
+- scripts/cron-deepeval-report.sh: weekly deepeval quality report (Monday 03:00);
+  saves to reports/deepeval-DATE.json
+- src/compliance/training/llm_judge.py: LLM-as-judge using Ollama qwen3-banxe-v2;
+  JudgeResult(verdict, score, reasoning); graceful fallback when Ollama unreachable;
+  CLI: python3 llm_judge.py --statement "..." --category "A-compliance"
+- src/compliance/training/evidently_monitor.py: drift detection with DriftReport;
+  uses Evidently AI if installed, stdlib manual fallback (mean absolute delta);
+  check_drift(corpus_dir, window_days=7) → DriftReport; max_drift_score=0.15;
+  CLI: python3 evidently_monitor.py --corpus-dir ... --days 7 --json
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:17:43Z",
+  "extracted_at": "2026-04-05T01:20:39Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
