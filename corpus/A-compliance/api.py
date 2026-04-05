@@ -15,7 +15,7 @@ import glob
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import Depends, FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
@@ -34,6 +34,7 @@ from tx_monitor      import check_transaction      # backward-compat wrapper →
 from models          import TransactionInput        # for TransactionRequest mapping
 from sar_generator   import generate_sar
 from audit_trail     import log_screening, get_screening_history, get_stats, setup_schema
+from emergency_stop  import activate_stop, clear_stop, get_stop_state, require_not_stopped
 try:
     from legal_databases import check_legal_exposure
     LEGAL_DB_AVAILABLE = True
@@ -89,6 +90,15 @@ class TransactionRequest(BaseModel):
     from_account: Optional[str] = None
     to_account: Optional[str] = None
 
+class EmergencyStopRequest(BaseModel):
+    operator_id: str                # email or operator handle of the person activating stop
+    reason: str                     # mandatory free-text explanation (audit trail)
+    scope: str = "all"              # "all" or comma-separated engine list (Phase 2)
+
+class EmergencyResumeRequest(BaseModel):
+    mlro_id: str                    # MLRO identity — required for resume authority
+    resume_reason: str              # mandatory explanation for clearing stop
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -143,7 +153,11 @@ def _make_decision(composite: int, rm: dict) -> str:
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.post("/api/v1/screen/person")
-async def screen_person(req: PersonScreenRequest, background_tasks: BackgroundTasks):
+async def screen_person(
+    req: PersonScreenRequest,
+    background_tasks: BackgroundTasks,
+    _: None = Depends(require_not_stopped),
+):
     """
     Full person screening: Sanctions + PEP + Adverse Media (PARALLEL SCREENING LAYER).
     Returns risk decision and SAR draft if required.
@@ -245,7 +259,11 @@ async def screen_person(req: PersonScreenRequest, background_tasks: BackgroundTa
 
 
 @app.post("/api/v1/screen/company")
-async def screen_company(req: CompanyScreenRequest, background_tasks: BackgroundTasks):
+async def screen_company(
+    req: CompanyScreenRequest,
+    background_tasks: BackgroundTasks,
+    _: None = Depends(require_not_stopped),
+):
     """KYB company screening with UBO sanctions/PEP check."""
     name = req.name.strip()
     if not name:
@@ -286,7 +304,11 @@ async def screen_company(req: CompanyScreenRequest, background_tasks: Background
 
 
 @app.post("/api/v1/screen/wallet")
-async def screen_wallet(req: WalletScreenRequest, background_tasks: BackgroundTasks):
+async def screen_wallet(
+    req: WalletScreenRequest,
+    background_tasks: BackgroundTasks,
+    _: None = Depends(require_not_stopped),
+):
     """Crypto wallet AML screening via FINOS OpenAML + Watchman OFAC."""
     result = await check_wallet(req.address, req.chain)
 
@@ -305,7 +327,10 @@ async def screen_wallet(req: WalletScreenRequest, background_tasks: BackgroundTa
 
 
 @app.post("/api/v1/transaction/check")
-async def transaction_check(req: TransactionRequest):
+async def transaction_check(
+    req: TransactionRequest,
+    _: None = Depends(require_not_stopped),
+):
     """Real-time transaction monitoring rules (structuring, velocity, jurisdiction)."""
     # Map Pydantic request → TransactionInput dataclass expected by tx_monitor
     tx_input = TransactionInput(
@@ -431,12 +456,112 @@ async def compliance_stats():
     return await get_stats()
 
 
+# ── EU AI Act Art. 14 — Emergency Stop endpoints ─────────────────────────────
+
+@app.post("/api/v1/compliance/emergency-stop")
+async def emergency_stop(req: EmergencyStopRequest):
+    """
+    Activate emergency stop: suspend all automated compliance screening.
+
+    EU AI Act Art. 14 — human oversight.  While active, all screening endpoints
+    return HTTP 503 and require manual MLRO review.
+
+    operator_id: identity of the person activating the stop (required for audit).
+    reason:      mandatory explanation (logged to CRITICAL, stored in Redis + file).
+    scope:       "all" (default) — Phase 2 will support per-engine scope.
+    """
+    if not req.operator_id.strip():
+        raise HTTPException(400, "operator_id is required")
+    if not req.reason.strip():
+        raise HTTPException(400, "reason is required")
+
+    state = await activate_stop(
+        operator_id=req.operator_id.strip(),
+        reason=req.reason.strip(),
+        scope=req.scope.strip() or "all",
+    )
+    return {
+        "status":       "stop_activated",
+        "activated_at": state["activated_at"],
+        "operator_id":  state["operator_id"],
+        "scope":        state["scope"],
+        "message":      (
+            "All automated compliance screening is now suspended. "
+            "Manual MLRO review required for all decisions. "
+            "Resume via POST /api/v1/compliance/emergency-resume (MLRO authority)."
+        ),
+    }
+
+
+@app.post("/api/v1/compliance/emergency-resume")
+async def emergency_resume(req: EmergencyResumeRequest):
+    """
+    Clear emergency stop: resume automated compliance screening.
+
+    Requires MLRO authority (mlro_id must be provided).
+    Previous stop state is returned for audit purposes.
+    """
+    if not req.mlro_id.strip():
+        raise HTTPException(400, "mlro_id is required")
+    if not req.resume_reason.strip():
+        raise HTTPException(400, "resume_reason is required")
+
+    current = await get_stop_state()
+    if not current.get("active"):
+        return {
+            "status":  "not_stopped",
+            "message": "No active emergency stop — system is already running.",
+        }
+
+    prev = await clear_stop(
+        mlro_id=req.mlro_id.strip(),
+        resume_reason=req.resume_reason.strip(),
+    )
+    return {
+        "status":           "resumed",
+        "resumed_at":       datetime.now(timezone.utc).isoformat(),
+        "mlro_id":          req.mlro_id.strip(),
+        "resume_reason":    req.resume_reason.strip(),
+        "previous_stop":    {
+            "activated_at": prev.get("activated_at"),
+            "operator_id":  prev.get("operator_id"),
+            "reason":       prev.get("reason"),
+            "scope":        prev.get("scope"),
+        },
+        "message": "Automated compliance screening resumed.",
+    }
+
+
+@app.get("/api/v1/compliance/emergency-stop/status")
+async def emergency_stop_status():
+    """
+    Current emergency stop state.  Safe to poll — read-only, no side effects.
+    Returns active=false when system is running normally.
+    """
+    state = await get_stop_state()
+    return {
+        "active":        state.get("active", False),
+        "activated_at":  state.get("activated_at"),
+        "operator_id":   state.get("operator_id"),
+        "reason":        state.get("reason"),
+        "scope":         state.get("scope"),
+        "screening_suspended": state.get("active", False),
+    }
+
+
 @app.get("/api/v1/health")
 async def health():
     """Health check: Watchman, Jube, Postgres, Redis, ClickHouse."""
     checks = {}
     async with httpx.AsyncClient(timeout=3) as client:
-        # Watchman
+        # Yente (OpenSanctions) — Phase 3, ADR-009
+        try:
+            r = await client.get("http://127.0.0.1:8086/")
+            checks["yente"] = "ok" if r.status_code == 200 else f"http_{r.status_code}"
+        except Exception as e:
+            checks["yente"] = f"error: {e}"
+
+        # Watchman (fallback sanctions source)
         try:
             r = await client.get("http://127.0.0.1:8084/v2/search", params={"name": "test", "limit": 1})
             checks["watchman"] = "ok" if r.status_code == 200 else f"http_{r.status_code}"
