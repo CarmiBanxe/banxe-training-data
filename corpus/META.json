@@ -1,27 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "07775da1620601aa079040bd08038b07d67c3ee6",
-  "source_message": "feat: migrate-gateway-to-openclaw-user.sh — diagnostic + migration plan
+  "source_commit": "c58c9957fd77c90bebf75d1e51610571b85e3330",
+  "source_message": "docs: MEMORY.md — close Marble TODO, mark think:false as verified
 
-scripts/migrate-gateway-to-openclaw-user.sh (+x):
-- default (no flags): read-only diagnostic over SSH — shows openclaw current
-  shell, home, running user, systemd service status
-- prints 5-step migration plan without executing anything (QRAA-safe)
-- --execute flag required for any live changes (shell change, config copy,
-  systemd unit update, service restart)
-
-Migration plan when --execute:
-  1. usermod -s /bin/bash openclaw
-  2. cp config /root/.openclaw-moa/ → /home/openclaw/.openclaw/
-  3. chown -R openclaw:openclaw /home/openclaw/.openclaw/
-  4. Update systemd unit: User=openclaw, OPENCLAW_HOME=/home/openclaw/.openclaw
-  5. daemon-reload + restart + health check
-
-Usage: bash scripts/migrate-gateway-to-openclaw-user.sh          # diagnosis
-       bash scripts/migrate-gateway-to-openclaw-user.sh --execute  # live run
+- Marble skill: TODO → DONE (workspace-moa/skills/marble-cases/SKILL.md created)
+- think:false: КРИТИЧНО → verified (2026-04-05):
+  OpenClaw sends only num_ctx+streaming via params;
+  thinking suppressed via Modelfile <think></think> + thinkingDefault:"off"
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:41:35Z",
+  "extracted_at": "2026-04-05T01:42:06Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

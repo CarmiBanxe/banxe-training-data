@@ -104,7 +104,9 @@
 
 - DONE: Security hardening, GTT unlock (59392MB), ROCm, qwen3:30b-a3b, Sanctions policy, Verification env, SOUL.md deployment (chattr +i + soul-protected + SOUL GUARD в autosync)
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
-- КРИТИЧНО: think:false через params — проверить что OpenClaw передаёт в Ollama API
+- ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
+  Thinking подавлено через пустой <think></think> в Modelfile + thinkingDefault:"off" в openclaw.json.
+  Действие не требуется — механизм работает корректно.
 
 ## Compliance Stack (src/compliance/)
 
@@ -153,7 +155,7 @@
 - Organisation: Banxe (created)
 - Admin user: mark@banxe.com (created)
 - Auth: Firebase emulator (local mode, no cloud Firebase needed)
-- OpenClaw skill: workspace-moa/skills/marble-cases/SKILL.md (TODO)
+- OpenClaw skill: workspace-moa/skills/marble-cases/SKILL.md ✅ DONE (2026-04-05)
 - MLRO рабочий стол: http://[gmktec]:5003
 
 ### Полный стек (после деплоя Phase 2)
