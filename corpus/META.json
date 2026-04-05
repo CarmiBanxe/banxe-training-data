@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "cf13ec6490eef836e01777c3e671073bf82918c8",
-  "source_message": "feat(validators): G-11 trust zone validator — RED/AMBER/GREEN enforcement, 28 tests",
-  "extracted_at": "2026-04-05T19:42:24Z",
+  "source_commit": "2755210efc2aa26492b1c9783fe96b8a1d987ed3",
+  "source_message": "chore: update drift baseline after G-11 validator added",
+  "extracted_at": "2026-04-05T19:42:44Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
