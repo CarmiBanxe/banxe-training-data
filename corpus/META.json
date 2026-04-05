@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "1fc7046ede50da2756b032719560a1535094c230",
-  "source_message": "docs: MEMORY.md — архитектурный аудит v2, gap register, sprint план",
-  "extracted_at": "2026-04-05T13:41:37Z",
+  "source_commit": "f398d965b55c9f1331ada81d94374baf9c6c8f46",
+  "source_message": "docs: MEMORY.md — audit v3, 22 gaps, Sprint 0 added",
+  "extracted_at": "2026-04-05T13:50:48Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

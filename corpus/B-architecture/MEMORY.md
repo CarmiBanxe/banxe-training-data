@@ -371,10 +371,11 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
   Promptfoo cron: /etc/cron.d/banxe-promptfoo-eval — воскресенье 04:00 (GAP 3, 2026-04-05)
   Cron adversarial sim: /etc/cron.d/banxe-adversarial (вс 02:00)
 
-## Архитектурный аудит v2 (2026-04-05)
+## Архитектурный аудит v3 (2026-04-05)
 
-Проведён глубокий аудит по 10 классическим принципам + OpenClaw/multi-agent специфика.
-Полный реестр: `banxe-architecture/GAP-REGISTER.md` (15 пробелов, спринт-план).
+Проведён глубокий аудит по 10+ классическим принципам + OpenClaw/multi-agent специфика + FINOS AIGF v2.0.
+Полный реестр: `banxe-architecture/GAP-REGISTER.md` (22 пробела: P1×7, P2×11, P3×4).
+Sprint 0 план: `banxe-architecture/SPRINT-0-PLAN.md` (Ports, Bounded Contexts, Hooks, AIGF mapping).
 
 ### Оценки по принципам
 | Принцип | Оценка | Главный gap |
@@ -403,11 +404,22 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
   - CLASS_B_SOUL_AGENTS: feedback_loop can_apply=NEVER, unanimous MLRO+CTO required
 
 ### Sprint план (приоритет при возврате к коду)
-1. G-03 [PAUSED]: Завершить stop button — тесты + Marble UI + deploy (PRIORITY #1)
-2. G-05 [DONE-DOCS]: change-classes.yaml создан; CI enforcement в Sprint 3
-3. G-02: ExplanationBundle в risk_contract.py
-4. G-01: Decision Event Log PostgreSQL
-5. G-07: compliance_config.yaml
+0. Sprint 0 (архитектурный): Ports & Adapters + Bounded Contexts + 4 Claude Hooks + AIGF mapping
+   Файл: `banxe-architecture/SPRINT-0-PLAN.md`
+1. G-03 [PAUSED, PRIORITY #1]: Завершить stop button → EmergencyPort adapter
+2. G-16: PolicyPort, DecisionPort, AuditPort, EmergencyPort спецификации
+3. G-02: ExplanationBundle в risk_contract.py → DecisionPort output
+4. G-01: Decision Event Log (PostgresEventLogAdapter)
+5. G-07: compliance_config.yaml → ComplianceConfigAdapter
+
+### Новые gaps из v3 (G-16..G-22)
+- G-16 (P1): Hexagonal Architecture — нет Ports & Adapters
+- G-17 (P1): Event Sourcing — нет domain events для решений
+- G-18 (P2): DDD — плоская структура, нет 5 bounded contexts
+- G-19 (P2): Controls-as-code (OPA/Rego) вместо bash-скрипта
+- G-20 (P2): 12-Factor — нет release pipeline + structured logging
+- G-21 (P2): Нет зонирования AI-генерации в Claude Code hooks
+- G-22 (P3): FINOS AIGF v2.0 mapping — PARTIAL (таблица в SPRINT-0-PLAN.md)
 
 ## Policy Provenance (2026-04-05)
 
