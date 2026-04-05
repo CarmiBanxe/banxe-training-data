@@ -1,8 +1,23 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "3aea9ae83cc7e3746a975e23a11e6748249813aa",
-  "source_message": "docs(memory): mark banxe-architecture as published (6a4da41)",
-  "extracted_at": "2026-04-05T12:20:50Z",
+  "source_commit": "47a058676b555b5192195a11068da939af633c03",
+  "source_message": "feat(infra): deploy-phase3-opensanctions.sh — Yente stub (ADR-009)
+
+5-step deployment stub for OpenSanctions/Yente on GMKtec:
+  [1/5] docker + docker compose check
+  [2/5] /opt/banxe/opensanctions/ + docker-compose.yml (port 8086),
+        manifest.yml (default catalog + wikidata PEP + local TODO),
+        .env.example
+  [3/5] image pull + docker compose up -d
+  [4/5] health check with retry (6×20s; warns on slow initial index)
+  [5/5] next steps: test match query, sanctions_check.py routing,
+        registry binding, reindex command, production hardening TODO
+
+Watchman :8084 remains active as fallback per ADR-009.
+--dry-run flag supported.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-05T12:54:40Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
