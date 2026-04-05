@@ -112,7 +112,14 @@
 - DONE (2026-04-05): policy_scope propagated → AMLResult + BanxeAMLResult → ClickHouse audit_trail (policy_jurisdiction/regulator/framework) (vibe-coding 4760b7d)
 - DONE (2026-04-05): train-agent.sh --force safety gate — BLOCKED если accuracy<85% или drift>0.15 (ADR-003) (45bb5ef)
 - DONE (2026-04-05): banxe-architecture опубликован → https://github.com/CarmiBanxe/banxe-architecture (6a4da41)
-- PENDING: Задеплоить GAP 5 → `bash scripts/deploy-gap5-drift-monitor.sh`
+- DONE (2026-04-05): GAP 5 deploy → задеплоен, status=no_corpus (ожидает первого train-agent.sh)
+- DONE (2026-04-05): scenario_registry engines bindings — case_orchestrator SCN-001 + ML sanctions SCN-002 (38637ec)
+- DONE (2026-04-05): sanctions_check.py ADR-009 routing — Yente :8086 primary → Watchman :8084 fallback → local fuzzy (119c357)
+- DONE (2026-04-05): emergency_stop.py + api.py — EU AI Act Art.14 stop button (d5c1007), syntax OK
+- [PAUSED, PRIORITY #1] Stop button endpoint — тесты не написаны, Marble UI кнопка не подключена, production deploy не выполнен. Возобновить первым при возврате к коду.
+- [PAUSED] ExplanationBundle runtime (XAI, EU AI Act + FCA PS7/24)
+- [PAUSED] compliance_config.yaml externalization (12-Factor Factor III)
+- [PAUSED] Bounded Context context.yaml (import boundaries, DDD)
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
 - PENDING: GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.

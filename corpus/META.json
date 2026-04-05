@@ -1,15 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "119c357324a40fc75c7dad56e0ac867b1e72e77a",
-  "source_message": "feat(sanctions): Yente primary source, Watchman fallback (ADR-009)
+  "source_commit": "bab1ec98521aa17960fbe8524a5a589df12a81e3",
+  "source_message": "wip: emergency stop endpoint — paused, syntax OK, tests pending
 
-Routing order: Yente :8086 → Watchman :8084 → local_fuzzy (offline)
-_yente_match(): batched POST /match, FtM schema mapping, score >= 0.80
-screen_entity(): new Rule 2 (Yente) before old Rule 2 (Watchman)
-sources_checked updated: [yente, watchman, local_fuzzy]
-MODEL-YENTE-FUZZY-NAME engine binding in registry enabled: false until
-Yente health-check passes post-deploy.",
-  "extracted_at": "2026-04-05T13:21:23Z",
+DONE: emergency_stop.py + api.py (d5c1007) — syntax check passed
+DONE: sanctions_check ADR-009 routing (119c357)
+DONE: scenario_registry engines bindings (38637ec)
+PAUSED #1: stop button integration tests + Marble UI + production deploy
+PAUSED: ExplanationBundle, compliance_config.yaml, Bounded Context
+MEMORY.md updated with full paused/done state.",
+  "extracted_at": "2026-04-05T13:32:21Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
