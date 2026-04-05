@@ -1,24 +1,20 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "e0ff94d7e1890904e805887494f5bf9584fea808",
-  "source_message": "feat(security): G-10 Zero Standing Privileges — JIT credentials, 31 tests
+  "source_commit": "94cbf0b0e5c98436f036bd5ca8d3d9c9077271e4",
+  "source_message": "feat(utils): G-13 Compliance Snapshot Bundle — ZIP export for auditors, 28 tests
 
-- Add compliance/security/jit_credentials.py: CredentialScope enum (5 scopes,
-  intentionally no POLICY_WRITE per I-22/B-06), TemporaryCredential frozen
-  dataclass, InMemoryCredentialStore (thread-safe), JITCredentialManager with
-  ZSP-01 enforcement (Level-3 blocked from EMIT_DECISION/APPEND_AUDIT/
-  CHECK_EMERGENCY/ORCHESTRATE; Level-2 blocked from ORCHESTRATE), singleton
-  get_credential_manager()
-- Add compliance/security/__init__.py: package exports
-- Add test_jit_credentials.py: 31 tests T-01..T-28 (issuance, TTL, revocation,
-  scope violations, active_count, purge_expired, to_dict security)
-- Fix pyproject.toml: add pythonpath=["src"] so compliance.* imports resolve
-- Fix _get_logger: use logger.event(payload=kwargs) — StructuredLogger has no .log()
-
-Full suite: 579 passed (0 failed)
+- compliance_snapshot.py: ComplianceSnapshot dataclass, collect_snapshot(),
+  export_snapshot_zip(), to_markdown() for MLRO; collects policy checksums
+  (SHA-256), invariants count, test results, passports count, rego rules,
+  GAP summary, thresholds, git SHA; ZIP contains snapshot.json + snapshot.md
+  + 5 artefact files (compliance_config.yaml, INVARIANTS.md, GAP-REGISTER.md,
+  change-classes.yaml, trust-zones.yaml)
+- CLI: python -m compliance.utils.compliance_snapshot --output /tmp/audit.zip
+- 28 tests T-01..T-28 (collection, checksums, ZIP content, idempotency,
+  graceful missing files, to_markdown sections)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T19:56:25Z",
+  "extracted_at": "2026-04-05T20:40:39Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
