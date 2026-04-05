@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "77f2160fdc456c4965bb388ebb5c10fafd956357",
-  "source_message": "chore: update policy drift baseline after SQL file change",
-  "extracted_at": "2026-04-05T19:14:24Z",
+  "source_commit": "5b0fbfda004eb9d43894b9c80717d91a16cfd209",
+  "source_message": "feat(contexts): G-18 DDD bounded contexts registry — 5 contexts, AST validator, 40 tests",
+  "extracted_at": "2026-04-05T19:21:54Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
