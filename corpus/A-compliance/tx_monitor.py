@@ -230,8 +230,6 @@ async def score_transaction(tx: TransactionInput) -> tuple[list[RiskSignal], dic
 # Backwards-compatible alias used by existing callers
 async def check_transaction(tx: TransactionInput) -> dict:
     """Legacy wrapper — use aml_orchestrator.assess() for new code."""
-    from compliance.models import AMLResult
-    from compliance.verification.compliance_validator import _THRESHOLD_SAR, _THRESHOLD_REJECT, _THRESHOLD_HOLD
     signals, meta = await score_transaction(tx)
     score = min(sum(s.score for s in signals), 100)
     decision = ("SAR" if score >= _THRESHOLD_SAR else
