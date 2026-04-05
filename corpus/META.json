@@ -1,18 +1,16 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "4612681b90dcdf944ef6f059758987be1cc71288",
-  "source_message": "fix: protect-soul.sh — SOUL_PROTECTED user-scoped + selective sudo for chattr/root paths
+  "source_commit": "06907ffbbb96ac964da57e377cb8f462d7ac489e",
+  "source_message": "fix(gap3): scp promptfoo.yaml instead of git clone on GMKtec
 
-- SOUL_PROTECTED: /root/.openclaw-moa/ → /home/mmber/.openclaw-moa/soul-protected/
-  (user-owned, writable by mmber without root)
-- cmd_update: mkdir -p for new user path
-- cmd_deploy/verify/unlock: sudo only for WORKSPACE_ROOT (root-owned) and all chattr calls
-- deploy-gap1-auto-verify.sh: revert sudo bash → bash (protect-soul.sh handles sudo internally)
-- docs/MEMORY.md: update canonical source path
-- docs/SOUL-PROTECTION.md: update path table and architecture note
+- deploy-gap3-promptfoo.sh: replace git clone with scp Legion→GMKtec
+  target: /data/banxe/promptfoo/compliance/training/promptfoo.yaml
+  cron entry sets DEVELOPER_DIR=/data/banxe/promptfoo
+- run-promptfoo-eval.sh: auto-detect DEVELOPER_DIR (git repo or scp path)
+  git push conditional — skipped if not a git repo
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T02:37:09Z",
+  "extracted_at": "2026-04-05T02:40:57Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
