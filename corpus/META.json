@@ -1,27 +1,24 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "ebc54c9beca41b11508f3f29bac6786bb0718fba",
-  "source_message": "feat(compliance): structured_logger.py — Factor XI / G-20
+  "source_commit": "b48d802349e87fff51497329c15342a44f63120e",
+  "source_message": "test(compliance): emergency stop integration tests — 17/17 T-01..T-17
 
-- New: compliance/utils/structured_logger.py
-  One JSON line per event → stdout → ClickHouse pipeline
-  Correlation IDs: tx_id + case_id + scenario_id (replay capability G-01 partial)
-  Methods: event(), decision(), warning_event(), error_event(), critical_event()
-  None-values stripped — clean ClickHouse schema
+Tests cover I-23 (stop checked before every decision) and I-24 (audit trail):
+  T-01..T-04  Idle status, activate response, validation (operator_id/reason required)
+  T-05..T-08  I-23: all 4 screening endpoints return 503 while stop active
+              (screen/person, screen/company, screen/wallet, transaction/check)
+  T-09..T-11  Resume idempotency, validation (mlro_id/resume_reason required)
+  T-12        Full lifecycle: activate → 503 → MLRO resume → 200
+  T-13        Fail-open: Redis + filesystem both unavailable → 200, not 503
+  T-14..T-15  Status endpoint reflects active state correctly
+  T-16        Idempotent activate: double-activate still blocks screening
+  T-17        Resume response contains previous stop metadata (audit trail I-24)
 
-- sanctions_check.py: structured logging via _log
-  JURISDICTION_A_BLOCK (CRITICAL), SANCTIONS_SCREEN_HIT/CLEAR, YENTE_UNAVAILABLE, WATCHMAN_UNAVAILABLE
-
-- banxe_aml_orchestrator.py: _log.decision() after every BanxeAMLResult
-  Logs: decision, composite_score, tx_id, case_id, channel, policy_version
-
-- All 57 tests pass
-
-Closes: GAP-REGISTER G-20 (Factor XI compliance logging)
-Invariant: I-24 (audit events logged), supports G-01 (replay via correlation IDs)
+Architecture: in-memory Redis stub + /tmp stop file + all external deps mocked
+Runs fully on Legion (no GMKtec, no /data, no redis package needed)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T15:10:09Z",
+  "extracted_at": "2026-04-05T15:33:33Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
