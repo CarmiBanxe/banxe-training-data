@@ -1,8 +1,16 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "6de43951a08573754e55f5a3db5ed6e2c2027b1d",
-  "source_message": "docs: MEMORY.md — GAP 1/2/3 completed (2026-04-05)",
-  "extracted_at": "2026-04-05T02:25:04Z",
+  "source_commit": "56a7f742b9524ff7f3efaa2855fc3a679a685883",
+  "source_message": "fix: deploy scripts — chattr +i sudo + developer-core path on GMKtec
+
+- deploy-gap1-auto-verify.sh step [4/5]: add sudo before protect-soul.sh
+  (chattr requires root; SSH runs as mmber)
+- deploy-gap3-promptfoo.sh step [2/4]: replace git pull with clone-or-pull
+  (developer-core does not exist on GMKtec, must be cloned first)
+- run-promptfoo-eval.sh: add auto-clone developer-core if missing at DEVELOPER_DIR
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-05T02:29:13Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
