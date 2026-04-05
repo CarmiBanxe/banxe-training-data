@@ -1,18 +1,27 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "e88e5c2e7894d6634df51968a760744d4be53b5d",
-  "source_message": "sync: COMPLIANCE_ARCH.md Phase 16 to docs/ + sync script
+  "source_commit": "07775da1620601aa079040bd08038b07d67c3ee6",
+  "source_message": "feat: migrate-gateway-to-openclaw-user.sh — diagnostic + migration plan
 
-- docs/COMPLIANCE_ARCH.md: copy of src/compliance/COMPLIANCE_ARCH.md (Phase 16,
-  2026-04-05) for MkDocs navigation; authoritative source stays in src/compliance/
-- scripts/sync-compliance-arch.sh: sync helper — copies src/compliance/ → docs/;
-  --full flag also pushes to ~/developer/compliance/ (developer-core)
+scripts/migrate-gateway-to-openclaw-user.sh (+x):
+- default (no flags): read-only diagnostic over SSH — shows openclaw current
+  shell, home, running user, systemd service status
+- prints 5-step migration plan without executing anything (QRAA-safe)
+- --execute flag required for any live changes (shell change, config copy,
+  systemd unit update, service restart)
 
-Note: developer-core had v1.0 (2026-04-03); vibe-coding is Phase 16 (2026-04-05)
-with 3-layer architecture diagram — vibe-coding is the authoritative source.
+Migration plan when --execute:
+  1. usermod -s /bin/bash openclaw
+  2. cp config /root/.openclaw-moa/ → /home/openclaw/.openclaw/
+  3. chown -R openclaw:openclaw /home/openclaw/.openclaw/
+  4. Update systemd unit: User=openclaw, OPENCLAW_HOME=/home/openclaw/.openclaw
+  5. daemon-reload + restart + health check
+
+Usage: bash scripts/migrate-gateway-to-openclaw-user.sh          # diagnosis
+       bash scripts/migrate-gateway-to-openclaw-user.sh --execute  # live run
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:27:15Z",
+  "extracted_at": "2026-04-05T01:41:35Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
