@@ -1,41 +1,47 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "3b5ad066142a7a92040e427ab9a60275ebdeb376",
-  "source_message": "feat(g03): emergency stop Marble UI + production deploy (G-03 complete)
+  "source_commit": "b6541abf2217b13a41ff81895584c2d5b8c087b2",
+  "source_message": "feat(g01): Decision Event Log — append-only PostgreSQL audit trail
 
-admin panel (emergency_panel.html):
-  - Dark-theme HTML/CSS/JS — zero external dependencies
-  - Live status polling every 15s
-  - Activate form: operator_id + reason (EU AI Act Art. 14)
-  - Resume form: mlro_id + resume_reason (MLRO authority gate)
-  - Visual: green dot (running) / red pulsing (SUSPENDED)
-  - URL: GET /compliance/admin/emergency (served by FastAPI)
+ports/audit_port.py (G-16 partial):
+  AuditPort ABC — append_event() + query_events() only
+  No update_event/delete_event — I-24 enforced at design level
 
-api.py:
-  - Added HTMLResponse import
-  - New endpoint GET /compliance/admin/emergency → serves panel
+utils/decision_event_log.py:
+  DecisionEvent dataclass — immutable, from_aml_result() factory
+  PostgresEventLogAdapter — asyncpg, ON CONFLICT DO NOTHING (idempotent)
+    fail-safe: DB errors logged, never propagated to caller
+  InMemoryAuditAdapter — for tests/dev, no Postgres required
+  get_decision_log() / set_decision_log() — injectable adapter pattern
 
-marble_emergency_workflow.json:
-  - n8n workflow spec for Marble webhook → compliance API routing
-  - Handles: activate / resume / status actions
-  - Webhook: POST /webhook/marble-emergency (n8n :5678)
+decision_events.sql (migration):
+  CREATE TABLE banxe_compliance.decision_events
+  REVOKE UPDATE, DELETE ON decision_events FROM banxe_app_role  ← I-24
+  GRANT SELECT, INSERT only
+  Indexes: case_id, customer_id, occurred_at, tx_id, decision
 
-scripts/deploy-emergency-stop.sh:
-  - Full 6-step production deploy on GMKtec
-  - Creates /data/banxe/data/ dirs, checks Redis, restarts API
-  - Smoke test: activate → 503 → resume → 200 (I-23 verification)
+banxe_aml_orchestrator.py:
+  Import DecisionEvent + get_decision_log
+  After every banxe_assess(): append_event (fire-and-forget)
+  DB failure never affects compliance decision output
 
-test_emergency_stop.py:
-  - Fixed sys.modules cleanup after module teardown
-  - Prevents mock contamination of other test files (order-independent)
+test_decision_event_log.py — 15 tests:
+  T-01..T-02  from_aml_result mapping, append returns event_id
+  T-03..T-05  query by case_id / customer_id / idempotent
+  T-06        I-24: no update/delete methods on port or adapters
+  T-07..T-08  PostgresEventLogAdapter fail-safe + mocked insert
+  T-09..T-10  get/set_decision_log injection
+  T-11        banxe_assess() → append_event called (integration point)
+  T-12..T-15  JSON serialisable, ABC abstract, query limit
 
-Tests: 74/74 pass in both orderings
+Tests: 89/89 pass
 
-Closes: GAP-REGISTER G-03 (pending deploy)
-Invariants: I-23 (stop check before decision), I-24 (audit trail)
+Closes: GAP-REGISTER G-01 (pending migration deploy)
+Invariants: I-24 (append-only audit trail)
+Supports: replay_decision.py (G-01 replay via case_id / customer_id query)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T15:45:17Z",
+  "extracted_at": "2026-04-05T16:03:35Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
