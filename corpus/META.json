@@ -1,65 +1,70 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "3b8459259b7a607ceb260f1be7f0caa680b93a16",
-  "source_message": "feat(compliance): G-04 Trust Boundaries — OrchestrationTree + 34 tests (203/203 suite)
+  "source_commit": "819f315432a40a5617eb84898add6daf9a97be5a",
+  "source_message": "feat(governance): G-21 Claude Code hooks — 4 hooks + settings.json (30/30 tests, suite 324/324)
 
-Implements GAP-REGISTER G-04: formal trust boundary enforcement between agents
-in the BANXE multi-agent compliance stack.
+Implements GAP-REGISTER G-21: vibe-coding governance via Claude Code hooks.
+Prevents accidental policy-layer modifications and enforces architectural boundaries.
 
-── New: src/compliance/agents/orchestration_tree.py ─────────────────────────
-AgentDescriptor (frozen dataclass):
-  - agent_id, level (1/2/3), capabilities (tuple), trust_zone (GREEN/AMBER/RED)
-  - has_capability() helper
+── .claude/settings.json ────────────────────────────────────────────────────
+Project-level hook configuration (committed — applies to all Claude Code sessions
+in this repo).  Uses absolute paths to be CWD-independent.
 
-TrustViolation dataclass:
-  - caller_id, callee_id, rule (B-01..B-06), message, blocked (True=hard, False=warn)
+  PreToolUse  → Edit|Write  → policy_guard.py      (CLASS_B/C file guard)
+  PostToolUse → Edit|Write  → invariant_check.py   (I-22/I-24/I-25 scan)
+                            → bounded_context_check.py  (G-18 import rules)
+  UserPromptSubmit          → load_architecture.py (arch context on relevant queries)
 
-TrustBoundaryError(RuntimeError):
-  - Carries list[TrustViolation]; raised by assert_call_allowed() on any blocked violation
+── .claude/hooks/policy_guard.py  (PreToolUse — BLOCKS) ─────────────────────
+Reads tool_input.file_path from stdin JSON.
+Matches against CLASS_B and CLASS_C patterns from change_classes.yaml (G-05):
 
-OrchestrationTree:
-  - register() / get() / registered_ids()
-  - check_call(caller, callee) → list[TrustViolation]  (all violations)
-  - can_call(caller, callee)   → bool  (True only when no blocked violations)
-  - assert_call_allowed()      → raises TrustBoundaryError or returns warnings
-  - check_capability()         → TrustViolation | None  (B-06 policy_write guard)
+CLASS_C (MLRO|CEO required — exit 2):
+  compliance_config.yaml, banxe_compliance.rego, any .rego file
 
-Boundary rules:
-  B-01  Level-2 → Level-1  BLOCKED  (lateral privilege escalation)
-  B-02  Level-3 → Level-1  BLOCKED
-  B-03  Level-3 → Level-2  BLOCKED  (adapters must call through Ports)
-  B-04  RED → GREEN         BLOCKED  (untrusted → trusted boundary)
-  B-05  AMBER → GREEN       WARN     (audited, not blocked)
-  B-06  Level-2/3 + policy_write  BLOCKED  (I-22 PolicyPort read-only)
+CLASS_B (DEVELOPER|CTIO|CEO required — exit 2):
+  SOUL.md, SOUL-*.md, IDENTITY.md, BOOTSTRAP.md, openclaw.json
 
-get_default_tree() singleton with all BANXE agents pre-registered:
-  Level-1: banxe_aml_orchestrator
-  Level-2: aml_orchestrator, tx_monitor, sanctions_check, crypto_aml
-  Level-3: watchman_adapter(AMBER), jube_adapter(AMBER), yente_adapter(AMBER),
-           clickhouse_writer(GREEN)
+Allowed: all other files → exit 0, silent
+Bypass: GOVERNANCE_BYPASS=1 env var for protect-soul.sh / emergency use
+Output: actionable message with exact governance path command
 
-── Modified: src/compliance/banxe_aml_orchestrator.py ──────────────────────
-Added Step 1 (trust boundary check) before _layer2_assess:
-  - get_default_tree().assert_call_allowed("banxe_aml_orchestrator", "aml_orchestrator")
-  - Any AMBER→GREEN warnings logged via _log.warning_event("TRUST_BOUNDARY_WARN")
-  - TrustBoundaryError propagates as hard failure (blocked call aborts assess())
+── .claude/hooks/invariant_check.py  (PostToolUse — warns only) ─────────────
+Fires on compliance/ and developer/ file edits.
+Inline invariant rules (no Semgrep required):
+  I-22: PolicyPort write method detection
+  I-24: DecisionEvent field mutation after creation
+  I-25: result.explanation = None in orchestrator
+  I-21: Hardcoded threshold numbers instead of config_loader
+Optional Semgrep integration when .semgrep/banxe-rules.yml present.
+Always exit 0 (warn, never blocks).
 
-Tests: test_orchestration_tree.py T-01..T-34 — 34 passed
-  T-01..T-02: AgentDescriptor immutability + has_capability
-  T-03..T-08: Level-based boundary rules
-  T-09..T-10: Zone-based rules (B-04 blocked, B-05 warn)
-  T-11..T-12: Capability rules B-06 (Level-2 blocked, Level-1 allowed)
-  T-13..T-16: assert_call_allowed + can_call
-  T-17..T-18: Unknown agents default to Level-3 RED (conservative)
-  T-19..T-21: check_capability policy_write enforcement
-  T-22..T-29: Default tree — singleton + all agent levels + call matrix
-  T-30..T-33: TrustBoundaryError + fresh instance isolation + re-register + ids
-  T-34: Integration smoke-test — banxe_aml_orchestrator imports with tree active
+── .claude/hooks/bounded_context_check.py  (PostToolUse — warns only) ───────
+Fires on all .py edits.  Checks 5 boundary rules:
+  BC-01: agents/ must not import engine modules directly (use Ports)
+  BC-02: event_sourcing/ must not import banxe_aml_orchestrator
+  BC-03: governance/ must not import from agents/ (cross-cutting concern)
+  BC-04: test files must use InMemoryAuditAdapter, not Postgres
+  BC-05: Fan-out detector — warns if a module imports from ≥4 sub-packages
+Always exit 0 (warn, never blocks).
 
-Full suite: 203/203 passed
+── .claude/hooks/load_architecture.py  (UserPromptSubmit — silent by default) ─
+Fires on every user message; outputs one-line summary ONLY when prompt
+contains architecture keywords (gap, invariant, cqrs, bounded context, etc.):
+  [BANXE ARCH] Suite: 324 tests ✓ | Gaps P1: 8 DONE / 0 OPEN | Hooks: G-21 active | Sprint P2
+Silent on non-architecture queries — minimal noise.
+
+Tests: test_hooks.py T-01..T-30 — 30 passed
+  T-01..T-05: settings.json structure + all 4 scripts exist + valid syntax
+  T-06..T-17: policy_guard (SOUL blocked, AGENTS allowed, CLASS_C, bypass, governance path)
+  T-18..T-20: invariant_check (non-compliance silent, malformed JSON fail-open)
+  T-21..T-26: bounded_context_check (BC-01..BC-04 + clean file silent)
+  T-27..T-30: load_architecture (unrelated silent, gap/invariant/architecture → summary)
+
+Full suite: 324/324 passed
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T17:17:57Z",
+  "extracted_at": "2026-04-05T17:51:04Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
