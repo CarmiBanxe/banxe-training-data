@@ -1,23 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "47a058676b555b5192195a11068da939af633c03",
-  "source_message": "feat(infra): deploy-phase3-opensanctions.sh — Yente stub (ADR-009)
+  "source_commit": "119c357324a40fc75c7dad56e0ac867b1e72e77a",
+  "source_message": "feat(sanctions): Yente primary source, Watchman fallback (ADR-009)
 
-5-step deployment stub for OpenSanctions/Yente on GMKtec:
-  [1/5] docker + docker compose check
-  [2/5] /opt/banxe/opensanctions/ + docker-compose.yml (port 8086),
-        manifest.yml (default catalog + wikidata PEP + local TODO),
-        .env.example
-  [3/5] image pull + docker compose up -d
-  [4/5] health check with retry (6×20s; warns on slow initial index)
-  [5/5] next steps: test match query, sanctions_check.py routing,
-        registry binding, reindex command, production hardening TODO
-
-Watchman :8084 remains active as fallback per ADR-009.
---dry-run flag supported.
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T12:54:40Z",
+Routing order: Yente :8086 → Watchman :8084 → local_fuzzy (offline)
+_yente_match(): batched POST /match, FtM schema mapping, score >= 0.80
+screen_entity(): new Rule 2 (Yente) before old Rule 2 (Watchman)
+sources_checked updated: [yente, watchman, local_fuzzy]
+MODEL-YENTE-FUZZY-NAME engine binding in registry enabled: false until
+Yente health-check passes post-deploy.",
+  "extracted_at": "2026-04-05T13:21:23Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
