@@ -13,21 +13,16 @@
 -- Authority: DORA Art. 14(2), FCA MLR 2017 record-keeping (5-year TTL)
 -- ---------------------------------------------------------------------------
 
+-- NOTE: banxe_app_role must be created before running this script.
+-- Run as postgres superuser (one-time): see scripts/deploy-decision-event-log.sh
+-- The role creation requires CREATEROLE privilege (superuser only in most setups).
+
 BEGIN;
 
 -- ── Schema ──────────────────────────────────────────────────────────────────
 CREATE SCHEMA IF NOT EXISTS banxe_compliance;
 
--- ── Role (application role — minimal privileges) ──────────────────────────
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'banxe_app_role') THEN
-    CREATE ROLE banxe_app_role NOLOGIN;
-  END IF;
-END
-$$;
-
--- Grant schema usage
+-- Grant schema usage to app role (role must already exist)
 GRANT USAGE ON SCHEMA banxe_compliance TO banxe_app_role;
 
 -- ── Table ────────────────────────────────────────────────────────────────────
