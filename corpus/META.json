@@ -1,19 +1,17 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "90e7eb6e505e9a50bd83aef6a4227da7476190bd",
-  "source_message": "feat: ChatGPT Actions sync — OpenAPI export script + sync checklist
+  "source_commit": "661410a81b85ea2e339a8013536affa65998d7b5",
+  "source_message": "test: backup-clickhouse-training dry-run + test harness
 
-- scripts/export-openapi-schema.sh: exports OpenAPI schema from compliance API
-  (port 8090); tries live API, falls back to temporary uvicorn; generates
-  docs/CHATGPT-ACTIONS-SPEC.md with endpoint table and import instructions
-- docs/CHATGPT-SYNC-CHECKLIST.md: step-by-step checklist for syncing ChatGPT
-  Custom GPT (Actions schema, System Prompt, Knowledge files, end-to-end tests)
+- scripts/test-backup-clickhouse.sh: 5-step test harness (4 pass, 1 skip without CH);
+  validates script exists, CH reachability, dry-run execution, JSONL validity via Python,
+  evidently_monitor corpus read; --dry-run flag runs without live ClickHouse
 
-Note: bridge_api.py not present in vibe-coding (port 8092 = separate project);
-this targets the main compliance API (api.py, port 8090, banxe-api.service).
+- scripts/backup-clickhouse-training.sh: add --dry-run flag (shows SQL, no execution);
+  add graceful CH availability check — exit 0 (not exit 1) when CH unreachable
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:23:03Z",
+  "extracted_at": "2026-04-05T01:24:44Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
