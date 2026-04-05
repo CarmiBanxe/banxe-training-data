@@ -1,37 +1,65 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "7b74ebd50ab9b91fa9b916982c9f249589005a7f",
-  "source_message": "feat(compliance): G-16 Hexagonal Architecture — 4 Port ABCs + 5 Adapters (30/30 tests)
+  "source_commit": "3b8459259b7a607ceb260f1be7f0caa680b93a16",
+  "source_message": "feat(compliance): G-04 Trust Boundaries — OrchestrationTree + 34 tests (203/203 suite)
 
-Implements GAP-REGISTER G-16: formalises Hexagonal Architecture (Ports & Adapters)
-as the architectural foundation for the compliance stack (Sprint 0 design, I-21–I-25).
+Implements GAP-REGISTER G-04: formal trust boundary enforcement between agents
+in the BANXE multi-agent compliance stack.
 
-Ports (ABCs — src/compliance/ports/):
-  - PolicyPort     — get_threshold / get_jurisdiction_class / get_forbidden_patterns
-  - DecisionPort   — emit_decision (async, returns DecisionEvent)
-  - EmergencyPort  — is_stopped / activate / clear / get_status (async)
-  - AuditPort      — already existed; now re-exported from ports/__init__.py
+── New: src/compliance/agents/orchestration_tree.py ─────────────────────────
+AgentDescriptor (frozen dataclass):
+  - agent_id, level (1/2/3), capabilities (tuple), trust_zone (GREEN/AMBER/RED)
+  - has_capability() helper
 
-Adapters (src/compliance/adapters/):
-  - ComplianceConfigPolicyAdapter — production PolicyPort backed by compliance_config.yaml (G-07)
-  - InMemoryPolicyAdapter         — test/dev PolicyPort with threshold/jurisdiction overrides
-  - BanxeAMLDecisionAdapter       — production DecisionPort → AuditPort (constructor injection)
-  - MockDecisionAdapter           — test DecisionPort, captures emissions for assertion
-  - InMemoryEmergencyAdapter      — test/dev EmergencyPort, full lifecycle + reset()
+TrustViolation dataclass:
+  - caller_id, callee_id, rule (B-01..B-06), message, blocked (True=hard, False=warn)
 
-Tests: test_ports.py T-01..T-30 — 30 passed (full suite 169/169 green)
-- T-01: ports/__init__.py exports all 4 ABCs
-- T-02–T-05: ABC instantiation guard
-- T-06–T-12: ComplianceConfigPolicyAdapter thresholds/jurisdictions/forbidden
-- T-13: I-22 — no write/mutate methods on PolicyPort
-- T-14–T-16: InMemoryPolicyAdapter defaults + overrides
-- T-17–T-22: BanxeAMLDecisionAdapter + MockDecisionAdapter round-trips
-- T-23–T-28: InMemoryEmergencyAdapter lifecycle
-- T-29: DecisionPort + AuditPort composition round-trip
-- T-30: All 4 ports importable from compliance.ports
+TrustBoundaryError(RuntimeError):
+  - Carries list[TrustViolation]; raised by assert_call_allowed() on any blocked violation
+
+OrchestrationTree:
+  - register() / get() / registered_ids()
+  - check_call(caller, callee) → list[TrustViolation]  (all violations)
+  - can_call(caller, callee)   → bool  (True only when no blocked violations)
+  - assert_call_allowed()      → raises TrustBoundaryError or returns warnings
+  - check_capability()         → TrustViolation | None  (B-06 policy_write guard)
+
+Boundary rules:
+  B-01  Level-2 → Level-1  BLOCKED  (lateral privilege escalation)
+  B-02  Level-3 → Level-1  BLOCKED
+  B-03  Level-3 → Level-2  BLOCKED  (adapters must call through Ports)
+  B-04  RED → GREEN         BLOCKED  (untrusted → trusted boundary)
+  B-05  AMBER → GREEN       WARN     (audited, not blocked)
+  B-06  Level-2/3 + policy_write  BLOCKED  (I-22 PolicyPort read-only)
+
+get_default_tree() singleton with all BANXE agents pre-registered:
+  Level-1: banxe_aml_orchestrator
+  Level-2: aml_orchestrator, tx_monitor, sanctions_check, crypto_aml
+  Level-3: watchman_adapter(AMBER), jube_adapter(AMBER), yente_adapter(AMBER),
+           clickhouse_writer(GREEN)
+
+── Modified: src/compliance/banxe_aml_orchestrator.py ──────────────────────
+Added Step 1 (trust boundary check) before _layer2_assess:
+  - get_default_tree().assert_call_allowed("banxe_aml_orchestrator", "aml_orchestrator")
+  - Any AMBER→GREEN warnings logged via _log.warning_event("TRUST_BOUNDARY_WARN")
+  - TrustBoundaryError propagates as hard failure (blocked call aborts assess())
+
+Tests: test_orchestration_tree.py T-01..T-34 — 34 passed
+  T-01..T-02: AgentDescriptor immutability + has_capability
+  T-03..T-08: Level-based boundary rules
+  T-09..T-10: Zone-based rules (B-04 blocked, B-05 warn)
+  T-11..T-12: Capability rules B-06 (Level-2 blocked, Level-1 allowed)
+  T-13..T-16: assert_call_allowed + can_call
+  T-17..T-18: Unknown agents default to Level-3 RED (conservative)
+  T-19..T-21: check_capability policy_write enforcement
+  T-22..T-29: Default tree — singleton + all agent levels + call matrix
+  T-30..T-33: TrustBoundaryError + fresh instance isolation + re-register + ids
+  T-34: Integration smoke-test — banxe_aml_orchestrator imports with tree active
+
+Full suite: 203/203 passed
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T17:03:18Z",
+  "extracted_at": "2026-04-05T17:17:57Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
