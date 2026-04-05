@@ -1,22 +1,19 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "da5d740b41878ffe49033e1cc276c259b268aafb",
-  "source_message": "feat: automated quality monitoring — cron scripts, LLM-as-judge, drift detection
+  "source_commit": "90e7eb6e505e9a50bd83aef6a4227da7476190bd",
+  "source_message": "feat: ChatGPT Actions sync — OpenAPI export script + sync checklist
 
-- scripts/cron-adversarial-sim.sh: cron wrapper for adversarial_sim.py (every 6h
-  or weekly Sunday 02:00); logs to logs/adversarial-DATE.jsonl + error log
-- scripts/cron-deepeval-report.sh: weekly deepeval quality report (Monday 03:00);
-  saves to reports/deepeval-DATE.json
-- src/compliance/training/llm_judge.py: LLM-as-judge using Ollama qwen3-banxe-v2;
-  JudgeResult(verdict, score, reasoning); graceful fallback when Ollama unreachable;
-  CLI: python3 llm_judge.py --statement "..." --category "A-compliance"
-- src/compliance/training/evidently_monitor.py: drift detection with DriftReport;
-  uses Evidently AI if installed, stdlib manual fallback (mean absolute delta);
-  check_drift(corpus_dir, window_days=7) → DriftReport; max_drift_score=0.15;
-  CLI: python3 evidently_monitor.py --corpus-dir ... --days 7 --json
+- scripts/export-openapi-schema.sh: exports OpenAPI schema from compliance API
+  (port 8090); tries live API, falls back to temporary uvicorn; generates
+  docs/CHATGPT-ACTIONS-SPEC.md with endpoint table and import instructions
+- docs/CHATGPT-SYNC-CHECKLIST.md: step-by-step checklist for syncing ChatGPT
+  Custom GPT (Actions schema, System Prompt, Knowledge files, end-to-end tests)
+
+Note: bridge_api.py not present in vibe-coding (port 8092 = separate project);
+this targets the main compliance API (api.py, port 8090, banxe-api.service).
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T01:20:39Z",
+  "extracted_at": "2026-04-05T01:23:03Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
