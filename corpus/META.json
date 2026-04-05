@@ -1,8 +1,37 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "15b612de33b75f302377d9081766265e8823ee56",
-  "source_message": "docs: MEMORY.md — session close 2026-04-05, GAP 1/2/3 done, 4-8 pending",
-  "extracted_at": "2026-04-05T02:42:50Z",
+  "source_commit": "178a9b6d63465119905423e1f576b9799c99513f",
+  "source_message": "feat: GAP 5 drift monitor + banxe-architecture + privilege model
+
+ЗАДАЧА 1 — fix: deploy-gap1-auto-verify.sh
+  Step [2/5] now copies both skills to workspace:
+  - auto-verify/SKILL.md (existing)
+  - verify-statement/SKILL.md (added)
+
+ЗАДАЧА 2 — feat: banxe-architecture repo infrastructure
+  scripts/publish-architecture-repo.sh — creates CarmiBanxe/banxe-architecture
+  (run after: gh auth login)
+  Local repo ready at ~/banxe-architecture/:
+    README.md, INVARIANTS.md (18 invariants), PRIVILEGE-MODEL.md,
+    COMPLIANCE-ARCH.md, SANCTIONS-POLICY.md, STACK-LAYERS.md,
+    SOUL-TEMPLATE.md, SERVICE-MAP.md, DEFERRED-PROJECTS.md,
+    decisions/ADR-001-privilege-model.md,
+    decisions/ADR-002-telegram-bot-scope.md,
+    decisions/ADR-003-training-developer-only.md,
+    validators/check-compliance.sh
+
+ЗАДАЧА 3 — feat: GAP 5 evidently drift monitoring cron
+  scripts/run-drift-monitor.sh — 6h drift analysis on corpus JSONL
+    composite_drift = avg_drift×0.4 + refuted_rate×0.4 + flag_rate×0.2
+    Telegram alert if composite > 0.15
+    Evidently AI if available, else heuristic
+  scripts/deploy-gap5-drift-monitor.sh — deploys cron 0 */6 * * * on GMKtec
+
+docs/MEMORY.md: architecture constraints, privilege model, deferred projects,
+  GAP 4/5 completion, banxe-architecture reference
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-05T03:48:15Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
