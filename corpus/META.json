@@ -1,70 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "819f315432a40a5617eb84898add6daf9a97be5a",
-  "source_message": "feat(governance): G-21 Claude Code hooks — 4 hooks + settings.json (30/30 tests, suite 324/324)
-
-Implements GAP-REGISTER G-21: vibe-coding governance via Claude Code hooks.
-Prevents accidental policy-layer modifications and enforces architectural boundaries.
-
-── .claude/settings.json ────────────────────────────────────────────────────
-Project-level hook configuration (committed — applies to all Claude Code sessions
-in this repo).  Uses absolute paths to be CWD-independent.
-
-  PreToolUse  → Edit|Write  → policy_guard.py      (CLASS_B/C file guard)
-  PostToolUse → Edit|Write  → invariant_check.py   (I-22/I-24/I-25 scan)
-                            → bounded_context_check.py  (G-18 import rules)
-  UserPromptSubmit          → load_architecture.py (arch context on relevant queries)
-
-── .claude/hooks/policy_guard.py  (PreToolUse — BLOCKS) ─────────────────────
-Reads tool_input.file_path from stdin JSON.
-Matches against CLASS_B and CLASS_C patterns from change_classes.yaml (G-05):
-
-CLASS_C (MLRO|CEO required — exit 2):
-  compliance_config.yaml, banxe_compliance.rego, any .rego file
-
-CLASS_B (DEVELOPER|CTIO|CEO required — exit 2):
-  SOUL.md, SOUL-*.md, IDENTITY.md, BOOTSTRAP.md, openclaw.json
-
-Allowed: all other files → exit 0, silent
-Bypass: GOVERNANCE_BYPASS=1 env var for protect-soul.sh / emergency use
-Output: actionable message with exact governance path command
-
-── .claude/hooks/invariant_check.py  (PostToolUse — warns only) ─────────────
-Fires on compliance/ and developer/ file edits.
-Inline invariant rules (no Semgrep required):
-  I-22: PolicyPort write method detection
-  I-24: DecisionEvent field mutation after creation
-  I-25: result.explanation = None in orchestrator
-  I-21: Hardcoded threshold numbers instead of config_loader
-Optional Semgrep integration when .semgrep/banxe-rules.yml present.
-Always exit 0 (warn, never blocks).
-
-── .claude/hooks/bounded_context_check.py  (PostToolUse — warns only) ───────
-Fires on all .py edits.  Checks 5 boundary rules:
-  BC-01: agents/ must not import engine modules directly (use Ports)
-  BC-02: event_sourcing/ must not import banxe_aml_orchestrator
-  BC-03: governance/ must not import from agents/ (cross-cutting concern)
-  BC-04: test files must use InMemoryAuditAdapter, not Postgres
-  BC-05: Fan-out detector — warns if a module imports from ≥4 sub-packages
-Always exit 0 (warn, never blocks).
-
-── .claude/hooks/load_architecture.py  (UserPromptSubmit — silent by default) ─
-Fires on every user message; outputs one-line summary ONLY when prompt
-contains architecture keywords (gap, invariant, cqrs, bounded context, etc.):
-  [BANXE ARCH] Suite: 324 tests ✓ | Gaps P1: 8 DONE / 0 OPEN | Hooks: G-21 active | Sprint P2
-Silent on non-architecture queries — minimal noise.
-
-Tests: test_hooks.py T-01..T-30 — 30 passed
-  T-01..T-05: settings.json structure + all 4 scripts exist + valid syntax
-  T-06..T-17: policy_guard (SOUL blocked, AGENTS allowed, CLASS_C, bypass, governance path)
-  T-18..T-20: invariant_check (non-compliance silent, malformed JSON fail-open)
-  T-21..T-26: bounded_context_check (BC-01..BC-04 + clean file silent)
-  T-27..T-30: load_architecture (unrelated silent, gap/invariant/architecture → summary)
-
-Full suite: 324/324 passed
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T17:51:04Z",
+  "source_commit": "159232c2ec9baf01f89c56741193445b0615083e",
+  "source_message": "feat(validators): G-08 policy drift detection — SHA-256 checksums for 5 policy files, 15 tests",
+  "extracted_at": "2026-04-05T18:17:07Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
