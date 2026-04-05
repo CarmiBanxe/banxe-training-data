@@ -1,13 +1,17 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "9af6018ab8aee73018d1e2fb361c8915322b586f",
-  "source_message": "chore(canon): add CANON v1.0 BANXE/DEV profile
+  "source_commit": "a3feb34103dd146714d5739c8799d10e6e6c6863",
+  "source_message": "fix(verify): fix endpoint paths and PYTHONPATH in verify-production.sh
 
-Synced from developer-core@97af4d2.
-Active profile: banxe (CORE+DOC+DEV+DECISION+rules).
+- FastAPI: /api/v1/health → /status?canon_guard (actual endpoint)
+- ClickHouse: SELECT 1 query with encoding issues → /ping endpoint
+- Redis: not installed on GMKtec, pre-tx gate is fail-open by design → non-critical
+- Emergency stop: API endpoint not yet exposed → non-critical warning
+- Blocked jurisdictions in Redis: non-critical (no Redis)
+- All smoke tests: add /data/banxe to sys.path for compliance.* imports
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T23:08:10Z",
+  "extracted_at": "2026-04-05T23:16:03Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
