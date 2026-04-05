@@ -1,23 +1,25 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "b7d9b882e059447149f695c334a4fabb335711b5",
-  "source_message": "feat(scripts): Sprint 6 production deploy + verification scripts
+  "source_commit": "e16a7f6b4af4c055b081b5ac444f4388bdd012b1",
+  "source_message": "feat(security): VaultCredentialStore — Vault KV v2 adapter with InMemory fallback, 28 tests
 
-- deploy-sprint6.sh: 8-step deployment to GMKtec
-  1. git pull --rebase
-  2. rsync compliance source via SSH
-  3. Redis blocked jurisdictions sync
-  4. PostgreSQL decision_events verification
-  5. Emergency stop endpoint check
-  6. FastAPI service restart
-  7. Pre-tx gate + JIT credentials smoke tests
-  8. Compliance snapshot ZIP to /tmp/audit-YYYY-MM-DD.zip
-- verify-production.sh: 14 post-deploy checks across 5 categories
-  (core services / infra / compliance stack / AI stack / security / audit)
-  exits 0 if all critical checks pass, 1 otherwise
+- vault_credential_store.py: VaultCredentialStore implements same interface as
+  InMemoryCredentialStore; VaultConfig (from_env(): VAULT_TOKEN/VAULT_ADDR/
+  VAULT_SECRET_ENGINE); _probe_vault() checks /v1/sys/health at startup;
+  fallback to InMemoryCredentialStore when Vault unreachable or token missing;
+  Vault KV v2 mapping: save→PUT, get→GET, revoke→mark revoked, purge→fallback
+- ZSP-01 enforcement preserved: all scope restrictions via JITCredentialManager
+  (Level-3 blocked from EMIT_DECISION/APPEND_AUDIT/CHECK_EMERGENCY/ORCHESTRATE)
+- get_credential_manager(prefer_vault=True): factory — selects Vault or InMemory
+  based on VAULT_TOKEN env + reachability; singleton; backward compatible
+- WARNING log when falling back to InMemory (StructuredLogger)
+- 28 tests: all run in fallback mode (no real Vault needed)
+
+Sprint 5 migration path from G-10: swap InMemoryCredentialStore → VaultCredentialStore
+via JITCredentialManager(store=VaultCredentialStore(config=...))
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T21:20:12Z",
+  "extracted_at": "2026-04-05T21:27:09Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
