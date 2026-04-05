@@ -1,8 +1,38 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "4061dbbc75de59d15efa7af92c315c6729c0316f",
-  "source_message": "docs: update MEMORY.md — verify API port 8094, adversarial sim cron",
-  "extracted_at": "2026-04-04T23:55:47Z",
+  "source_commit": "2d6184f828754238e388edcfd11e2c80f734ff9a",
+  "source_message": "feat: BANXE AML block runtime — 3-layer collective LexisNexis stack
+
+Phase 3: tx_monitor.py — 9 rules, score_transaction() → list[RiskSignal],
+  imports thresholds/jurisdictions from compliance_validator (Layer 1),
+  Redis velocity, legacy check_transaction() backward-compat wrapper.
+
+Phase 4: sanctions_check.py — stdlib urllib (no httpx), difflib fallback,
+  SanctionsSubject input, list[RiskSignal] output, SANCTIONS_CONFIRMED/
+  PROBABLE/SUBJECT_JURISDICTION_A/B rules.
+
+Phase 5: crypto_aml.py — stdlib urllib (no httpx, no FINOS OpenAML),
+  WalletScreeningInput input, list[RiskSignal] output, CRYPTO_SANCTIONS/
+  CRITICAL/HIGH_RISK/ELEVATED/HIGH_VALUE rules.
+
+Phase 2: models.py — shared data contracts: TransactionInput,
+  SanctionsSubject, WalletScreeningInput, CustomerProfile,
+  RiskSignal, AMLResult.
+
+Phase 6: aml_orchestrator.py — generic Layer 2 aggregator,
+  assess(tx, subject, wallet) → AMLResult, hard override rules.
+
+Phase 3b: banxe_aml_orchestrator.py — Layer 3 BANXE runtime,
+  banxe_assess(transaction, customer, counterparty, wallet, channel)
+  → BanxeAMLResult with case_id, policy_version, signal-priority
+  decision engine (hard overrides + high-risk floor), to_api_response()
+  and to_audit_dict() for ClickHouse insert.
+
+Phase 7: COMPLIANCE_ARCH.md — Phase 16, 3-layer ASCII diagram,
+  directory layout, example flow, signal-priority vs pure summation table.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-05T00:46:12Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

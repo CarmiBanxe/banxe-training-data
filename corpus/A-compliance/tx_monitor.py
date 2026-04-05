@@ -1,19 +1,45 @@
-#!/data/banxe/compliance-env/bin/python3
+#!/usr/bin/env python3
 """
-Transaction Monitor — Phase 11 (jube_lite)
-6 detection rules + Redis velocity counters.
-Jube TM (AGPLv3) handles the ML layer; this handles deterministic rules.
+Transaction Monitor — Layer 2 (Behavioural Monitoring)
+
+Orchestration layer that applies deterministic AML rules to transactions
+and produces a composite risk score + decision.
+
+Decision thresholds are imported from compliance_validator (Layer 1, source-of-truth):
+  _THRESHOLD_SAR    = 85   → SAR obligation + auto-file trigger
+  _THRESHOLD_REJECT = 70   → REJECT transaction
+  _THRESHOLD_HOLD   = 40   → HOLD + EDD required (below = APPROVE)
+
+Jurisdiction lists are imported from compliance_validator (Layer 1, source-of-truth):
+  _HARD_BLOCK_JURISDICTIONS  → Category A: sanctions (RU, BY, IR, KP, ...)
+                                Rule: immediate REJECT, score=100, MLRO notified
+  _HIGH_RISK_JURISDICTIONS   → Category B: EDD (SY, IQ, LB, YE, ...)
+                                Rule: score += 35, EDD mandatory, HOLD unless clear
+
+Jube TM (AGPLv3, port 5001) handles the ML/probabilistic layer; this module
+handles only deterministic rule-based monitoring.
+
+sanctions_check and crypto_aml are called by aml_orchestrator, not directly here.
 """
+from __future__ import annotations
+
 import asyncio
-import json
-import sys
-import os
 import time
-import hashlib
-from datetime import datetime, timezone
 from typing import Optional
 
-# Redis for velocity counters
+# ── Shared datamodel (models.py) ──────────────────────────────────────────────
+from compliance.models import TransactionInput, RiskSignal
+
+# ── Source-of-truth imports from Layer 1 (compliance_validator) ──────────────
+from compliance.verification.compliance_validator import (
+    _HARD_BLOCK_JURISDICTIONS,
+    _HIGH_RISK_JURISDICTIONS,
+    _THRESHOLD_SAR,
+    _THRESHOLD_REJECT,
+    _THRESHOLD_HOLD,
+)
+
+# Redis for velocity counters (optional — graceful fallback if unavailable)
 try:
     import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
@@ -22,23 +48,22 @@ except ImportError:
 
 REDIS_URL = "redis://127.0.0.1:6379"
 
-# High-risk jurisdictions (FATF + UK OFSI + EU sanctioned)
-HIGH_RISK_JURISDICTIONS = {
-    "RU", "BY", "IR", "KP", "CU", "MM", "AF", "VE",
-    "SY", "IQ", "LB", "YE", "HT", "ML", "LY", "SO", "SS",
-    "NI", "ZW", "SD", "CF", "BI",
-}
+# ── Module-level constants (NOT jurisdiction or threshold policy) ─────────────
+# These are operational parameters for rule windows, NOT compliance thresholds.
+# Compliance thresholds are imported above from compliance_validator.
 
-# Structuring detection window
-STRUCTURING_WINDOW_SEC  = 86400   # 24h
-STRUCTURING_THRESHOLD   = 10_000  # GBP/EUR reporting threshold
-STRUCTURING_MIN_TX      = 3       # minimum transactions to trigger
-VELOCITY_WINDOW_SEC     = 86400   # 24h for velocity checks
+_MLR_REPORTING_THRESHOLD_GBP = 10_000   # MLR 2017 single-tx reporting threshold
+_STRUCTURING_WINDOW_SEC      = 86_400   # 24h structuring detection window
+_STRUCTURING_MIN_TX          = 3        # min transactions to trigger structuring flag
+_VELOCITY_WINDOW_SEC         = 86_400   # 24h velocity window
+_VELOCITY_24H_LIMIT_GBP      = 25_000   # cumulative 24h flag threshold
+_ROUND_AMOUNT_MIN_GBP        = 5_000    # minimum amount to check for round-number pattern
+_RAPID_IN_OUT_WINDOW_SEC     = 3_600    # 1h layering detection window
 
-# Rule thresholds
-SINGLE_TX_FLAG  = 10_000   # GBP — MLR 2017 threshold
-VELOCITY_24H    = 25_000   # GBP — cumulative 24h
-ROUND_AMOUNT_MIN = 5_000   # flag round amounts above this
+# FX rates (approximate, for scoring only — not for settlement)
+_FX_RATES = {"GBP": 1.0, "EUR": 0.86, "USD": 0.79, "USDT": 0.79, "ETH": 2500.0}
+
+__all__ = ["score_transaction"]
 
 
 # ── Redis velocity helpers ────────────────────────────────────────────────────
@@ -55,7 +80,6 @@ async def _get_redis() -> Optional[object]:
 
 
 async def _add_velocity(r, account: str, amount: float, window: int) -> float:
-    """Add transaction to Redis sorted set, return 24h total."""
     if not r:
         return amount
     now = time.time()
@@ -66,7 +90,6 @@ async def _add_velocity(r, account: str, amount: float, window: int) -> float:
         await pipe.zadd(key, {tx_id: now})
         await pipe.zremrangebyscore(key, 0, now - window)
         await pipe.execute()
-        # Sum all amounts in window
         members = await r.zrange(key, 0, -1)
         total = sum(float(m.split(":")[1]) for m in members if ":" in m)
         await r.expire(key, window + 3600)
@@ -76,166 +99,203 @@ async def _add_velocity(r, account: str, amount: float, window: int) -> float:
 
 
 async def _get_recent_tx_count(r, account: str, window: int) -> int:
-    """Count transactions in window."""
     if not r:
         return 1
     now = time.time()
     key = f"banxe:velocity:{account}"
     try:
-        count = await r.zcount(key, now - window, now)
-        return count
+        return await r.zcount(key, now - window, now)
     except Exception:
         return 1
 
 
-# ── Detection rules ───────────────────────────────────────────────────────────
+# ── Scoring rules ─────────────────────────────────────────────────────────────
 
-async def check_transaction(tx: dict) -> dict:
+async def score_transaction(tx: TransactionInput) -> tuple[list[RiskSignal], dict]:
     """
-    Apply 6 AML detection rules to a transaction.
+    Apply deterministic transaction monitoring rules.
+    Returns (signals, meta) where meta carries velocity data for audit.
 
-    tx: {
-        from: str (account/name),
-        to: str,
-        amount: float,
-        currency: str,
-        tx_type: str,
-        jurisdiction: str (ISO2, optional),
-        from_account: str (optional),
-        to_account: str (optional),
-    }
-    Returns: {flagged, rules_triggered, risk_score, recommended_action, details}
+    Rule order:
+      1. Category A (hard-block) jurisdiction  → score=100, short-circuit
+      2. Category B (high-risk) jurisdiction   → score += 35, EDD required
+      3. Single-tx MLR reporting threshold     → score += 30
+      4. 24h velocity (cumulative)             → score += 40
+      5. Structuring (split payments)          → score += 60
+      6. Round amount (smurfing indicator)     → score += 15
+      7. Rapid in-out (layering)               → score += 50
+      8. Crypto flag                           → score += 20 (crypto_aml handles detail)
+      9. Caller-supplied flags                 → score += 10 each
     """
-    amount      = float(tx.get("amount", 0))
-    currency    = tx.get("currency", "GBP").upper()
-    sender      = tx.get("from", tx.get("from_account", "unknown"))
-    recipient   = tx.get("to", tx.get("to_account", "unknown"))
-    jurisdiction = (tx.get("jurisdiction", "") or "").upper()
-    tx_type     = tx.get("tx_type", "wire")
+    signals: list[RiskSignal] = []
 
-    # Normalise to GBP (approximate)
-    fx = {"EUR": 0.86, "USD": 0.79, "GBP": 1.0, "USDT": 0.79, "ETH": 2500.0}
-    amount_gbp = amount * fx.get(currency, 1.0)
+    origin = (tx.origin_jurisdiction or "").upper()
+    dest   = (tx.destination_jurisdiction or "").upper()
+    affected = {j for j in (origin, dest) if j}
 
-    rules_triggered = []
-    risk_score = 0
+    # ── Rule 1: Category A ────────────────────────────────────────────────────
+    hard_hits = affected & _HARD_BLOCK_JURISDICTIONS
+    if hard_hits:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="HARD_BLOCK_JURISDICTION", score=100,
+            reason=f"Category A (HARD BLOCK): {hard_hits} — SAMLA 2018 / UK HMT. MLRO notified.",
+            authority="SAMLA 2018 / UK HMT Consolidated List",
+            requires_edd=True, requires_mlro=True,
+        ))
+        r = await _get_redis()
+        velocity = await _add_velocity(r, tx.sender_account, tx.amount_gbp, _VELOCITY_WINDOW_SEC)
+        tx_count = await _get_recent_tx_count(r, tx.sender_account, _VELOCITY_WINDOW_SEC)
+        if r: await r.aclose()
+        return signals, {"velocity_24h_gbp": round(velocity, 2), "tx_count_24h": tx_count, "hard_block": True}
 
-    # ── Rule 1: Single transaction threshold (MLR 2017) ──────────────────────
-    if amount_gbp >= SINGLE_TX_FLAG:
-        rules_triggered.append({
-            "rule": "SINGLE_TX_THRESHOLD",
-            "detail": f"£{amount_gbp:,.0f} >= £{SINGLE_TX_FLAG:,} MLR threshold",
-            "score": 30,
-        })
-        risk_score += 30
+    # ── Rule 2: Category B ────────────────────────────────────────────────────
+    high_hits = affected & _HIGH_RISK_JURISDICTIONS
+    if high_hits:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="HIGH_RISK_JURISDICTION", score=35,
+            reason=f"Category B (HIGH RISK): {high_hits} — EDD mandatory (FCA EDD §4.2).",
+            authority="FCA EDD §4.2", requires_edd=True,
+        ))
 
-    # ── Rule 2: 24h velocity (cumulative) ────────────────────────────────────
+    # ── Rule 3: Single-tx threshold ──────────────────────────────────────────
+    if tx.amount_gbp >= _MLR_REPORTING_THRESHOLD_GBP:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="SINGLE_TX_THRESHOLD", score=30,
+            reason=f"£{tx.amount_gbp:,.0f} >= £{_MLR_REPORTING_THRESHOLD_GBP:,} MLR 2017 reporting threshold.",
+            authority="MLR 2017",
+        ))
+
+    # ── Rules 4+5: Velocity & structuring ────────────────────────────────────
     r = await _get_redis()
-    velocity_total = await _add_velocity(r, sender, amount_gbp, VELOCITY_WINDOW_SEC)
-    if velocity_total >= VELOCITY_24H:
-        rules_triggered.append({
-            "rule": "VELOCITY_24H",
-            "detail": f"24h cumulative £{velocity_total:,.0f} >= £{VELOCITY_24H:,}",
-            "score": 40,
-        })
-        risk_score += 40
+    velocity_total = await _add_velocity(r, tx.sender_account, tx.amount_gbp, _VELOCITY_WINDOW_SEC)
+    tx_count = await _get_recent_tx_count(r, tx.sender_account, _STRUCTURING_WINDOW_SEC)
 
-    # ── Rule 3: Structuring (multiple txs just below threshold) ──────────────
-    tx_count = await _get_recent_tx_count(r, sender, STRUCTURING_WINDOW_SEC)
-    if (amount_gbp >= STRUCTURING_THRESHOLD * 0.80 and
-            amount_gbp < STRUCTURING_THRESHOLD and
-            tx_count >= STRUCTURING_MIN_TX):
-        rules_triggered.append({
-            "rule": "POTENTIAL_STRUCTURING",
-            "detail": f"£{amount_gbp:,.0f} just below £{STRUCTURING_THRESHOLD:,} threshold, {tx_count} txs in 24h",
-            "score": 60,
-        })
-        risk_score += 60
+    if velocity_total >= _VELOCITY_24H_LIMIT_GBP:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="VELOCITY_24H", score=40,
+            reason=f"24h cumulative £{velocity_total:,.0f} >= £{_VELOCITY_24H_LIMIT_GBP:,}.",
+            authority="MLR 2017 §7 — ongoing monitoring",
+        ))
 
-    # ── Rule 4: Round amount (smurfing indicator) ─────────────────────────────
-    is_round = (amount_gbp >= ROUND_AMOUNT_MIN and
-                amount_gbp == round(amount_gbp, -3))
-    if is_round:
-        rules_triggered.append({
-            "rule": "ROUND_AMOUNT",
-            "detail": f"Round amount £{amount_gbp:,.0f} may indicate structuring",
-            "score": 15,
-        })
-        risk_score += 15
+    structuring_lower = _MLR_REPORTING_THRESHOLD_GBP * 0.80
+    if (structuring_lower <= tx.amount_gbp < _MLR_REPORTING_THRESHOLD_GBP
+            and tx_count >= _STRUCTURING_MIN_TX):
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="POTENTIAL_STRUCTURING", score=60,
+            reason=f"£{tx.amount_gbp:,.0f} just below threshold, {tx_count} txs in 24h — structuring indicator.",
+            authority="POCA 2002 §327-329", requires_mlro=True,
+        ))
 
-    # ── Rule 5: Rapid in-out (layering) ──────────────────────────────────────
-    in_key  = f"banxe:last_credit:{sender}"
-    out_key = f"banxe:last_debit:{sender}"
+    # ── Rule 6: Round amount ──────────────────────────────────────────────────
+    if tx.amount_gbp >= _ROUND_AMOUNT_MIN_GBP and tx.amount_gbp == round(tx.amount_gbp, -3):
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="ROUND_AMOUNT", score=15,
+            reason=f"Round amount £{tx.amount_gbp:,.0f} — smurfing indicator.",
+        ))
+
+    # ── Rule 7: Rapid in-out (layering) ──────────────────────────────────────
     if r:
         try:
-            last_credit = await r.get(in_key)
-            if last_credit:
+            last_credit = await r.get(f"banxe:last_credit:{tx.sender_account}")
+            if last_credit and tx.amount_gbp >= 1000:
                 elapsed = time.time() - float(last_credit)
-                if elapsed < 3600 and amount_gbp >= 1000:  # credited & debited within 1h
-                    rules_triggered.append({
-                        "rule": "RAPID_IN_OUT",
-                        "detail": f"Funds received {elapsed:.0f}s ago then immediately sent (layering indicator)",
-                        "score": 50,
-                    })
-                    risk_score += 50
-            await r.setex(out_key, VELOCITY_WINDOW_SEC, str(time.time()))
+                if elapsed < _RAPID_IN_OUT_WINDOW_SEC:
+                    signals.append(RiskSignal(
+                        source="tx_monitor", rule="RAPID_IN_OUT", score=50,
+                        reason=f"Funds credited {elapsed:.0f}s ago, immediately re-sent — layering indicator.",
+                        authority="JMLSG Part I §6.12", requires_mlro=True,
+                    ))
+            await r.setex(f"banxe:last_debit:{tx.sender_account}", _VELOCITY_WINDOW_SEC, str(time.time()))
         except Exception:
             pass
 
-    # ── Rule 6: High-risk jurisdiction ───────────────────────────────────────
-    if jurisdiction in HIGH_RISK_JURISDICTIONS:
-        rules_triggered.append({
-            "rule": "HIGH_RISK_JURISDICTION",
-            "detail": f"Jurisdiction {jurisdiction} is high-risk (FATF/OFSI/EU)",
-            "score": 35,
-        })
-        risk_score += 35
+    # ── Rule 8: Crypto flag ───────────────────────────────────────────────────
+    if tx.is_crypto:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule="CRYPTO_FLAG", score=20,
+            reason="Crypto transaction — elevated monitoring. Routed to crypto_aml for chain analysis.",
+        ))
 
-    if r:
-        await r.aclose()
+    # ── Rule 9: Caller flags ──────────────────────────────────────────────────
+    for flag in tx.flags:
+        signals.append(RiskSignal(
+            source="tx_monitor", rule=f"FLAG_{flag.upper()}", score=10,
+            reason=f"Caller-supplied flag: '{flag}'.",
+        ))
 
-    # ── Aggregate ─────────────────────────────────────────────────────────────
-    flagged = risk_score >= 30 or bool(rules_triggered)
-    recommended_action = (
-        "BLOCK_AND_SAR"  if risk_score >= 70 else
-        "HOLD_AND_REVIEW" if risk_score >= 40 else
-        "ENHANCED_MONITORING" if risk_score >= 30 else
-        "PASS"
-    )
+    if r: await r.aclose()
+    return signals, {"velocity_24h_gbp": round(velocity_total, 2), "tx_count_24h": tx_count, "hard_block": False}
 
+
+# Backwards-compatible alias used by existing callers
+async def check_transaction(tx: TransactionInput) -> dict:
+    """Legacy wrapper — use aml_orchestrator.assess() for new code."""
+    from compliance.models import AMLResult
+    from compliance.verification.compliance_validator import _THRESHOLD_SAR, _THRESHOLD_REJECT, _THRESHOLD_HOLD
+    signals, meta = await score_transaction(tx)
+    score = min(sum(s.score for s in signals), 100)
+    decision = ("SAR" if score >= _THRESHOLD_SAR else
+                "REJECT" if score >= _THRESHOLD_REJECT else
+                "HOLD" if score >= _THRESHOLD_HOLD else "APPROVE")
     return {
-        "flagged":   flagged,
-        "rules_triggered": rules_triggered,
-        "risk_score": risk_score,
-        "recommended_action": recommended_action,
-        "velocity_24h_gbp":  round(velocity_total, 2),
-        "transaction_count_24h": tx_count,
-        "details": {
-            "amount_gbp":    round(amount_gbp, 2),
-            "original":      f"{amount} {currency}",
-            "sender":        sender,
-            "recipient":     recipient,
-            "jurisdiction":  jurisdiction,
-        },
+        "flagged": score >= _THRESHOLD_HOLD,
+        "risk_score": score,
+        "recommended_action": decision,
+        "rules_triggered": [{"rule": s.rule, "detail": s.reason, "score": s.score} for s in signals],
+        **meta,
     }
 
 
-if __name__ == "__main__":
-    # Structuring test: 4 transactions of £8,500 in 24h
-    async def test():
-        tx = {
-            "from": "TEST_ACCOUNT_001",
-            "to": "RECIPIENT_UK",
-            "amount": 8500.0,
-            "currency": "GBP",
-            "tx_type": "wire",
-            "jurisdiction": "GB",
-        }
-        # Simulate 4 transactions
-        for i in range(4):
-            r = await check_transaction(tx)
-            print(f"TX {i+1}: flagged={r['flagged']}, score={r['risk_score']}, action={r['recommended_action']}")
-            print(f"  Rules: {[x['rule'] for x in r['rules_triggered']]}")
-            print()
 
-    asyncio.run(test())
+# ── TODO stubs for future modules ────────────────────────────────────────────
+# These will become real imports when the modules are implemented.
+# Uncomment and adjust when sanctions_check.py and crypto_aml.py are created.
+
+# from compliance.sanctions_check import screen_entity        # TODO
+# from compliance.crypto_aml import analyse_chain             # TODO
+
+
+# ── __main__ smoke tests ──────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    async def _run_smoke_tests():
+        sep = "=" * 60
+        tests = [
+            ("APPROVE",
+             TransactionInput("GB", "DE", 500.0, currency="GBP")),
+            ("HOLD",
+             TransactionInput("GB", "GB", 12_000.0, currency="GBP")),
+            ("REJECT / SAR (high-risk jurisdiction)",
+             TransactionInput("SY", "GB", 15_000.0, currency="GBP")),
+            ("REJECT (Category A — hard block)",
+             TransactionInput("RU", "GB", 100.0, currency="GBP")),
+            ("HOLD (structuring hint + round amount)",
+             TransactionInput("GB", "GB", 9_000.0, currency="GBP",
+                              sender_account="ACC001",
+                              flags=["structuring_hint"])),
+        ]
+
+        print(f"\n{sep}")
+        print("  tx_monitor.py — smoke tests")
+        print(f"  Thresholds: SAR>={_THRESHOLD_SAR}, "
+              f"REJECT>={_THRESHOLD_REJECT}, HOLD>={_THRESHOLD_HOLD}")
+        print(sep)
+
+        for label, tx in tests:
+            result = await check_transaction(tx)
+            decision = result["recommended_action"]
+            verdict = "OK" if decision.split()[0] in label else "?"
+            print(f"\n{verdict} [{label}]")
+            edd  = any(s["rule"] in ("HIGH_RISK_JURISDICTION", "HARD_BLOCK_JURISDICTION")
+                       for s in result["rules_triggered"])
+            mlro = any(s["rule"] in ("HARD_BLOCK_JURISDICTION", "POTENTIAL_STRUCTURING",
+                                     "RAPID_IN_OUT")
+                       for s in result["rules_triggered"])
+            print(f"   decision={decision}  score={result['risk_score']}  "
+                  f"edd={edd}  mlro={mlro}")
+            for s in result["rules_triggered"]:
+                print(f"   • [{s['score']:+d}] {s['rule']}: {s['detail']}")
+
+        print(f"\n{sep}")
+
+    asyncio.run(_run_smoke_tests())
