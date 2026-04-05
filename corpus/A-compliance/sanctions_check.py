@@ -30,6 +30,9 @@ from compliance.verification.compliance_validator import (
     _HARD_BLOCK_JURISDICTIONS,
     _HIGH_RISK_JURISDICTIONS,
 )
+from compliance.utils.structured_logger import get_logger
+
+_log = get_logger("sanctions_check")
 
 # ── ADR-009: Yente (OpenSanctions) primary — Watchman fallback ───────────────
 YENTE_URL          = "http://127.0.0.1:8086"   # Phase 3; port per SERVICE-MAP.md
@@ -84,7 +87,12 @@ def _yente_match(name: str, entity_type: str = "person", aliases: list[str] | No
         )
         with urllib.request.urlopen(req, timeout=YENTE_TIMEOUT) as resp:
             data = json.loads(resp.read())
-    except Exception:
+    except Exception as exc:
+        _log.warning_event("YENTE_UNAVAILABLE", {
+            "error": type(exc).__name__,
+            "fallback": "watchman",
+            "entity_type": entity_type,
+        })
         return []
 
     hits: list[dict] = []
@@ -119,7 +127,11 @@ def _watchman_search(name: str, limit: int = 5) -> list[dict]:
         with urllib.request.urlopen(url, timeout=WATCHMAN_TIMEOUT) as resp:
             data = json.loads(resp.read())
             return data.get("entities") or []
-    except Exception:
+    except Exception as exc:
+        _log.warning_event("WATCHMAN_UNAVAILABLE", {
+            "error": type(exc).__name__,
+            "fallback": "local_fuzzy",
+        })
         return []
 
 
@@ -243,7 +255,11 @@ def _jurisdiction_signal(subject: SanctionsSubject) -> Optional[RiskSignal]:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
+def screen_entity(
+    subject: SanctionsSubject,
+    tx_id: str | None = None,
+    scenario_id: str | None = None,
+) -> list[RiskSignal]:
     """
     Screen an entity against sanctions watchlists (ADR-009 routing).
 
@@ -261,6 +277,11 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
     # ── Rule 1: Category A jurisdiction (hard block, short-circuit) ────────────
     jur_signal = _jurisdiction_signal(subject)
     if jur_signal and jur_signal.rule == "SUBJECT_JURISDICTION_A":
+        _log.critical_event("JURISDICTION_A_BLOCK", {
+            "jurisdiction": subject.jurisdiction,
+            "entity_name": subject.name,
+            "rule": "SUBJECT_JURISDICTION_A",
+        }, tx_id=tx_id, scenario_id=scenario_id)
         return [jur_signal]
 
     # ── Rule 2: Yente primary (ADR-009) ───────────────────────────────────────
@@ -268,6 +289,7 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
 
     if yente_hits:
         signals.extend(_hits_to_signals(yente_hits))
+        _source_used = "yente"
     else:
         # ── Rule 3: Watchman fallback ─────────────────────────────────────────
         entities = _watchman_search(subject.name)
@@ -279,6 +301,7 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
 
         if entities:
             signals.extend(_hits_to_signals(_normalize_watchman(entities)))
+            _source_used = "watchman"
         else:
             # ── Rule 4: Local fuzzy fallback ──────────────────────────────────
             local_hits = _fuzzy_local_search(subject.name)
@@ -289,10 +312,32 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
                         break
             if local_hits:
                 signals.extend(_hits_to_signals(local_hits))
+                _source_used = "local_fuzzy"
+            else:
+                _source_used = "none"
 
     # ── Rule 5: Category B jurisdiction (EDD, non-blocking) ───────────────────
     if jur_signal:  # already confirmed it's B, not A
         signals.append(jur_signal)
+
+    # ── Structured log: screening result ──────────────────────────────────────
+    if signals:
+        top = max(signals, key=lambda s: s.score)
+        level = "CRITICAL" if top.score >= 100 else "WARNING" if top.score >= 70 else "INFO"
+        _log.event("SANCTIONS_SCREEN_HIT", {
+            "entity_name": subject.name,
+            "entity_type": subject.entity_type,
+            "rule": top.rule,
+            "score": top.score,
+            "source": _source_used,
+            "hit_count": len(signals),
+        }, tx_id=tx_id, scenario_id=scenario_id, level=level)
+    else:
+        _log.event("SANCTIONS_SCREEN_CLEAR", {
+            "entity_name": subject.name,
+            "entity_type": subject.entity_type,
+            "source": _source_used,
+        }, tx_id=tx_id, scenario_id=scenario_id)
 
     return signals
 
