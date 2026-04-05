@@ -1,47 +1,20 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "b6541abf2217b13a41ff81895584c2d5b8c087b2",
-  "source_message": "feat(g01): Decision Event Log — append-only PostgreSQL audit trail
+  "source_commit": "9f68aa479389138e5cd48326006d0138ca886ba0",
+  "source_message": "feat(g01): deploy-decision-event-log.sh — production migration script
 
-ports/audit_port.py (G-16 partial):
-  AuditPort ABC — append_event() + query_events() only
-  No update_event/delete_event — I-24 enforced at design level
+6-step idempotent deploy for GMKtec:
+1. git pull sync
+2. PostgreSQL / banxe_compliance DB check (auto-create if missing)
+3. decision_events.sql migration (IF NOT EXISTS — safe re-run)
+4. I-24 verification: INSERT+SELECT granted, UPDATE+DELETE revoked at DB level
+5. Python smoke test: PostgresEventLogAdapter insert → query → idempotency
+6. Summary with next step hint for G-02 ExplanationBundle
 
-utils/decision_event_log.py:
-  DecisionEvent dataclass — immutable, from_aml_result() factory
-  PostgresEventLogAdapter — asyncpg, ON CONFLICT DO NOTHING (idempotent)
-    fail-safe: DB errors logged, never propagated to caller
-  InMemoryAuditAdapter — for tests/dev, no Postgres required
-  get_decision_log() / set_decision_log() — injectable adapter pattern
-
-decision_events.sql (migration):
-  CREATE TABLE banxe_compliance.decision_events
-  REVOKE UPDATE, DELETE ON decision_events FROM banxe_app_role  ← I-24
-  GRANT SELECT, INSERT only
-  Indexes: case_id, customer_id, occurred_at, tx_id, decision
-
-banxe_aml_orchestrator.py:
-  Import DecisionEvent + get_decision_log
-  After every banxe_assess(): append_event (fire-and-forget)
-  DB failure never affects compliance decision output
-
-test_decision_event_log.py — 15 tests:
-  T-01..T-02  from_aml_result mapping, append returns event_id
-  T-03..T-05  query by case_id / customer_id / idempotent
-  T-06        I-24: no update/delete methods on port or adapters
-  T-07..T-08  PostgresEventLogAdapter fail-safe + mocked insert
-  T-09..T-10  get/set_decision_log injection
-  T-11        banxe_assess() → append_event called (integration point)
-  T-12..T-15  JSON serialisable, ABC abstract, query limit
-
-Tests: 89/89 pass
-
-Closes: GAP-REGISTER G-01 (pending migration deploy)
-Invariants: I-24 (append-only audit trail)
-Supports: replay_decision.py (G-01 replay via case_id / customer_id query)
+Run: cd ~/vibe-coding && git pull && bash scripts/deploy-decision-event-log.sh
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T16:03:35Z",
+  "extracted_at": "2026-04-05T16:09:27Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
