@@ -2,10 +2,12 @@
 """
 Sanctions Check — Layer 2 (Entity Screening)
 
-Screens entities against sanctions and watchlists:
-  PRIMARY:   Moov Watchman REST API (localhost:8084) — OFAC SDN / UN / EU / UK CSL /
+Screens entities against sanctions and watchlists (ADR-009 routing):
+  PRIMARY:   Yente (OpenSanctions) REST API (localhost:8086, Phase 3) — OFAC SDN /
+             UN / EU / UK HMT / US BIS + PEP/Wikidata  (MIT licence)
+  FALLBACK1: Moov Watchman REST API (localhost:8084) — OFAC SDN / UN / EU / UK CSL /
              US-CSL / FinCEN 311 / US BoS  (Apache 2.0, zero external calls)
-  FALLBACK:  Local fuzzy name matching (difflib.SequenceMatcher, stdlib only)
+  FALLBACK2: Local fuzzy name matching (difflib.SequenceMatcher, stdlib only)
 
 Decision vocabulary (aligned with compliance_validator thresholds):
   SANCTIONS_CONFIRMED  score=100  → auto-REJECT, MLRO notified (match ≥ 95%)
@@ -29,11 +31,78 @@ from compliance.verification.compliance_validator import (
     _HIGH_RISK_JURISDICTIONS,
 )
 
+# ── ADR-009: Yente (OpenSanctions) primary — Watchman fallback ───────────────
+YENTE_URL          = "http://127.0.0.1:8086"   # Phase 3; port per SERVICE-MAP.md
+YENTE_TIMEOUT      = 8    # seconds; Yente index queries can be slower than Watchman
+YENTE_MIN_SCORE    = 0.80 # matches WATCHMAN_MIN_MATCH for consistent thresholds
+
 WATCHMAN_URL       = "http://127.0.0.1:8084"
 WATCHMAN_MIN_MATCH = 0.80
 WATCHMAN_TIMEOUT   = 5    # seconds
 
+# Entity-type → Yente FtM schema mapping
+_YENTE_SCHEMA: dict[str, str] = {
+    "person":  "Person",
+    "company": "Organization",
+    "vessel":  "Vessel",
+    "aircraft": "Airplane",
+}
+
 __all__ = ["screen_entity"]
+
+
+# ── Yente HTTP (ADR-009 primary) ─────────────────────────────────────────────
+
+def _yente_match(name: str, entity_type: str = "person", aliases: list[str] | None = None) -> list[dict]:
+    """
+    POST /match to Yente.  Returns normalised hit list or [] on any error.
+
+    Yente request body:
+      {"queries": {"q0": {"schema": "Person", "properties": {"name": ["Alice"]}}}}
+    Response:
+      {"responses": {"q0": {"results": [{"score": 0.9, "caption": "Alice", "datasets": [...]}]}}}
+
+    All names (primary + aliases) are batched into a single request (up to 5 queries).
+    """
+    schema = _YENTE_SCHEMA.get(entity_type.lower(), "Person")
+    names_to_query = [name] + (aliases or [])[:4]   # cap at 5 total
+
+    queries: dict[str, dict] = {}
+    for i, n in enumerate(names_to_query):
+        queries[f"q{i}"] = {
+            "schema": schema,
+            "properties": {"name": [n]},
+        }
+
+    body = json.dumps({"queries": queries}).encode()
+    try:
+        req = urllib.request.Request(
+            f"{YENTE_URL}/match",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=YENTE_TIMEOUT) as resp:
+            data = json.loads(resp.read())
+    except Exception:
+        return []
+
+    hits: list[dict] = []
+    for qid, qresp in (data.get("responses") or {}).items():
+        for result in (qresp.get("results") or []):
+            score = float(result.get("score", 0.0))
+            if score >= YENTE_MIN_SCORE:
+                datasets = result.get("datasets") or []
+                hits.append({
+                    "source":      "yente",
+                    "list_name":   datasets[0] if datasets else "opensanctions",
+                    "name_match":  result.get("caption", ""),
+                    "score":       round(score, 3),
+                    "entity_type": result.get("schema", schema).lower(),
+                    "source_id":   result.get("id", ""),
+                })
+
+    return sorted(hits, key=lambda h: h["score"], reverse=True)
 
 
 # ── Watchman HTTP (stdlib urllib — no httpx dependency) ───────────────────────
@@ -176,13 +245,14 @@ def _jurisdiction_signal(subject: SanctionsSubject) -> Optional[RiskSignal]:
 
 def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
     """
-    Screen an entity against sanctions watchlists.
+    Screen an entity against sanctions watchlists (ADR-009 routing).
 
     Rule order:
       1. Category A jurisdiction → score=100, MLRO, short-circuit
-      2. Watchman primary search (+ alias search on miss)
-      3. Local fuzzy fallback (stdlib SequenceMatcher, offline-safe)
-      4. Category B jurisdiction → score=35, EDD (appended, not short-circuit)
+      2. Yente (OpenSanctions) POST /match — primary source (Phase 3, :8086)
+      3. Watchman GET /v2/search — fallback if Yente unavailable/empty (:8084)
+      4. Local fuzzy fallback (stdlib SequenceMatcher, offline-safe)
+      5. Category B jurisdiction → score=35, EDD (appended, not short-circuit)
 
     Returns list[RiskSignal] for aggregation by aml_orchestrator.
     """
@@ -193,30 +263,34 @@ def screen_entity(subject: SanctionsSubject) -> list[RiskSignal]:
     if jur_signal and jur_signal.rule == "SUBJECT_JURISDICTION_A":
         return [jur_signal]
 
-    # ── Rule 2: Watchman name search ──────────────────────────────────────────
-    entities = _watchman_search(subject.name)
+    # ── Rule 2: Yente primary (ADR-009) ───────────────────────────────────────
+    yente_hits = _yente_match(subject.name, subject.entity_type, subject.aliases[:4])
 
-    # Try aliases if primary name yields no hits
-    if not entities:
-        for alias in subject.aliases[:3]:
-            entities = _watchman_search(alias)
-            if entities:
-                break
-
-    if entities:
-        signals.extend(_hits_to_signals(_normalize_watchman(entities)))
+    if yente_hits:
+        signals.extend(_hits_to_signals(yente_hits))
     else:
-        # ── Rule 3: Local fuzzy fallback ──────────────────────────────────────
-        local_hits = _fuzzy_local_search(subject.name)
-        if not local_hits:
+        # ── Rule 3: Watchman fallback ─────────────────────────────────────────
+        entities = _watchman_search(subject.name)
+        if not entities:
             for alias in subject.aliases[:3]:
-                local_hits = _fuzzy_local_search(alias)
-                if local_hits:
+                entities = _watchman_search(alias)
+                if entities:
                     break
-        if local_hits:
-            signals.extend(_hits_to_signals(local_hits))
 
-    # ── Rule 4: Category B jurisdiction (EDD, non-blocking) ───────────────────
+        if entities:
+            signals.extend(_hits_to_signals(_normalize_watchman(entities)))
+        else:
+            # ── Rule 4: Local fuzzy fallback ──────────────────────────────────
+            local_hits = _fuzzy_local_search(subject.name)
+            if not local_hits:
+                for alias in subject.aliases[:3]:
+                    local_hits = _fuzzy_local_search(alias)
+                    if local_hits:
+                        break
+            if local_hits:
+                signals.extend(_hits_to_signals(local_hits))
+
+    # ── Rule 5: Category B jurisdiction (EDD, non-blocking) ───────────────────
     if jur_signal:  # already confirmed it's B, not A
         signals.append(jur_signal)
 
@@ -251,7 +325,7 @@ async def check_sanctions(name: str, entity_type: str = "person") -> dict:
         "hit_count":     len(signals),
         "lists_with_hits": sorted({s.rule for s in signals}),
         "top_match":     top_match,
-        "sources_checked": ["watchman", "local_fuzzy"],
+        "sources_checked": ["yente", "watchman", "local_fuzzy"],   # ADR-009 order
     }
 
 
