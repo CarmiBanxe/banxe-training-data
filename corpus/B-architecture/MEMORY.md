@@ -213,6 +213,17 @@ ClickHouse:9000 → FCA audit trail         always
   → workflow подберёт при следующем push
 # workflow verified 2026-04-04T21:11:15Z
 
+## HITL Bridge (2026-04-05)
+
+- Script: `scripts/hitl-bridge.sh` → задеплоен на GMKtec: `/data/vibe-coding/scripts/hitl-bridge.sh`
+- Вызывается: `~/developer/compliance/training/verification_graph.py` `node_hitl_interrupt`
+- Marble: POST http://localhost:5002/api/cases → создаёт HOLD кейс
+- Telegram: Bot API → 508602494 (CEO) + TELEGRAM_RECIPIENTS из /data/banxe/.env
+- Env: `TELEGRAM_BOT_TOKEN` или `MOA_BOT_TOKEN` в /data/banxe/.env
+- Graceful degradation: если Marble недоступен → только Telegram; если оба недоступны → exit 1
+- Лог: /data/logs/hitl-bridge.log
+- Вывод: `marble_case_id=<id>` (читается verification_graph.py → передаётся в ConsensusResult)
+
 ## Developer Core (~/developer → main, 2026-04-05)
 
 - Репо: `CarmiBanxe/developer-core`, локально: `~/developer`
