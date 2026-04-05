@@ -195,6 +195,15 @@ ClickHouse:9000 → FCA audit trail         always
 - /data/banxe-training/ — обучающий корпус (5 категорий A-E)
 - ClickHouse: banxe.verification_corpus — лог всех верификаций
 
+### Promptfoo eval cron (GAP 3, 2026-04-05)
+- Script: `scripts/run-promptfoo-eval.sh` → `/data/vibe-coding/scripts/run-promptfoo-eval.sh`
+- Cron: `/etc/cron.d/banxe-promptfoo-eval` — воскресенье 04:00 UTC (после adversarial sim 02:00)
+- Model: `ollama:chat:qwen3-banxe-v2` (заменено с qwen3:8b)
+- Config: `~/developer/compliance/training/promptfoo.yaml`
+- Results: `~/developer/compliance/training/results/kyc-specialist-results.json`
+- Alert: Telegram → 508602494 если fail_rate > 20%
+- Деплой: `bash scripts/deploy-gap3-promptfoo.sh`
+
 ### autoresearch (karpathy-style)
 - Роль: вспомогательный контур R&D, НЕ продовый
 - Оптимизирует: системные инструкции верификаторов, scoring, thresholds
