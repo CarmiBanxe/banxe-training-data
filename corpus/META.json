@@ -1,24 +1,41 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "b48d802349e87fff51497329c15342a44f63120e",
-  "source_message": "test(compliance): emergency stop integration tests — 17/17 T-01..T-17
+  "source_commit": "3b5ad066142a7a92040e427ab9a60275ebdeb376",
+  "source_message": "feat(g03): emergency stop Marble UI + production deploy (G-03 complete)
 
-Tests cover I-23 (stop checked before every decision) and I-24 (audit trail):
-  T-01..T-04  Idle status, activate response, validation (operator_id/reason required)
-  T-05..T-08  I-23: all 4 screening endpoints return 503 while stop active
-              (screen/person, screen/company, screen/wallet, transaction/check)
-  T-09..T-11  Resume idempotency, validation (mlro_id/resume_reason required)
-  T-12        Full lifecycle: activate → 503 → MLRO resume → 200
-  T-13        Fail-open: Redis + filesystem both unavailable → 200, not 503
-  T-14..T-15  Status endpoint reflects active state correctly
-  T-16        Idempotent activate: double-activate still blocks screening
-  T-17        Resume response contains previous stop metadata (audit trail I-24)
+admin panel (emergency_panel.html):
+  - Dark-theme HTML/CSS/JS — zero external dependencies
+  - Live status polling every 15s
+  - Activate form: operator_id + reason (EU AI Act Art. 14)
+  - Resume form: mlro_id + resume_reason (MLRO authority gate)
+  - Visual: green dot (running) / red pulsing (SUSPENDED)
+  - URL: GET /compliance/admin/emergency (served by FastAPI)
 
-Architecture: in-memory Redis stub + /tmp stop file + all external deps mocked
-Runs fully on Legion (no GMKtec, no /data, no redis package needed)
+api.py:
+  - Added HTMLResponse import
+  - New endpoint GET /compliance/admin/emergency → serves panel
+
+marble_emergency_workflow.json:
+  - n8n workflow spec for Marble webhook → compliance API routing
+  - Handles: activate / resume / status actions
+  - Webhook: POST /webhook/marble-emergency (n8n :5678)
+
+scripts/deploy-emergency-stop.sh:
+  - Full 6-step production deploy on GMKtec
+  - Creates /data/banxe/data/ dirs, checks Redis, restarts API
+  - Smoke test: activate → 503 → resume → 200 (I-23 verification)
+
+test_emergency_stop.py:
+  - Fixed sys.modules cleanup after module teardown
+  - Prevents mock contamination of other test files (order-independent)
+
+Tests: 74/74 pass in both orderings
+
+Closes: GAP-REGISTER G-03 (pending deploy)
+Invariants: I-23 (stop check before decision), I-24 (audit trail)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T15:33:33Z",
+  "extracted_at": "2026-04-05T15:45:17Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

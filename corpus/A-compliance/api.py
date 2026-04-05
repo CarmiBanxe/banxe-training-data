@@ -17,6 +17,7 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import httpx
 
@@ -454,6 +455,34 @@ async def entity_history(entity_name: str, limit: int = 20):
 async def compliance_stats():
     """Aggregate compliance statistics from ClickHouse."""
     return await get_stats()
+
+
+# ── EU AI Act Art. 14 — Emergency Stop admin panel ───────────────────────────
+
+_PANEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emergency_panel.html")
+
+
+@app.get("/compliance/admin/emergency", response_class=HTMLResponse, include_in_schema=False)
+async def emergency_panel():
+    """
+    MLRO admin panel for emergency stop (EU AI Act Art. 14).
+
+    Served as a static HTML page — no JS framework, no build step.
+    Access: http://<gmktec>:8090/compliance/admin/emergency
+    Bookmark this URL in Marble (or pin as a Marble case action link).
+
+    Features:
+    - Live status polling (15s interval)
+    - Activate stop: operator_id + reason
+    - Resume: mlro_id + resume_reason (MLRO authority)
+    - Visual indicator: green (running) / red pulsing (suspended)
+    """
+    try:
+        with open(_PANEL_PATH) as f:
+            html = f.read()
+    except FileNotFoundError:
+        raise HTTPException(500, "Emergency panel HTML not found")
+    return HTMLResponse(content=html)
 
 
 # ── EU AI Act Art. 14 — Emergency Stop endpoints ─────────────────────────────
