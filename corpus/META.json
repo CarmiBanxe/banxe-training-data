@@ -1,42 +1,33 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "d7a13105db0c3b6fbcca5bbcc31e447bc5b29455",
-  "source_message": "feat(g07): Externalize AML thresholds — 12-Factor Factor III
+  "source_commit": "1cbe34d9de64b74ba2aa0b2681758a3cc6163254",
+  "source_message": "feat(g19): OPA/Rego controls-as-code — I-21/I-22/I-23/I-25 enforcement
 
-New: compliance_config.yaml
-  Single source of truth for all policy values:
-  - decision_thresholds: SAR=85, REJECT=70, HOLD=40
-  - watchman/yente min_match=0.80
-  - jurisdictions: hard_block (11 Cat A), high_risk (6 Cat B)
-  - transaction_monitoring: mlr_reporting_threshold_gbp=10000
-  - forbidden_patterns: 17 regex red-lines
-  - policy: version, jurisdiction, audit_ttl_years
-  Override: COMPLIANCE_CONFIG_PATH env var
+New: policies/banxe_compliance.rego
+  Production Rego spec — 6 deny rules mirroring INVARIANTS.md:
+  I-22 (L2 policy write), I-21 (identity doc write + devcore push),
+  I-23 (emergency stop check), I-25 (ExplanationBundle > £10k),
+  SAR submit requires mlro_approved.
 
-New: utils/config_loader.py
-  Typed loader (lru_cache) with typed getters per value.
-  reload_config() clears cache for test isolation.
+New: utils/rego_evaluator.py
+  Python enforcement engine — same rules as Rego, no OPA binary required.
+  - PolicyInput / PolicyViolation dataclasses
+  - evaluate() / evaluate_dict() / is_allowed() API
+  - input_from_banxe_result() factory
+  - evaluate_via_opa() — OPA REST API client with Python fallback (Sprint 3)
 
-Modified: verification/compliance_validator.py
-  Replaces 7 hardcoded constants with config_loader calls.
-  Module-level names preserved — zero changes needed in 6 importers.
+Modified: banxe_aml_orchestrator.py
+  Post-decision invariant check after every banxe_assess():
+  - All violations logged as CRITICAL events (G-20 structured log)
+  - I-25 violation raises RuntimeError (code bug, fail-closed)
 
-Modified: utils/explanation_builder.py
-  Removes local threshold copies (85/70/40) → config_loader.
+New: test_rego_evaluator.py — 25 tests (T-01..T-25), 139/139 total pass
 
-Modified: sanctions_check.py
-  WATCHMAN_MIN_MATCH + YENTE_MIN_SCORE → config_loader.
-
-Modified: tx_monitor.py
-  _MLR_REPORTING_THRESHOLD_GBP → config_loader.
-
-New: test_config_loader.py — 18 tests (T-01..T-18)
-  All 114/114 tests pass.
-
-Closes: GAP-REGISTER G-07 (12-Factor Factor III)
+Closes: GAP-REGISTER G-19 (controls-as-code)
+Sprint 3: OPA sidecar deploy (G-14) will replace Python fallback
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T16:40:21Z",
+  "extracted_at": "2026-04-05T16:50:55Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
