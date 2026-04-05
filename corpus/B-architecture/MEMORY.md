@@ -245,6 +245,9 @@ ClickHouse:9000 → FCA audit trail         always
 - BUG FIX 2026-04-05: `without EDD` / `PEP without` добавлены в forbidden patterns compliance_validator
   (было: "Approve PEP without EDD" → CONFIRMED; стало: → REFUTED confidence 1.0)
 - Verify API: `banxe-verify-api.service` → порт 8094 (8091=HITL, 8092=Guiyon bridge)
-  Skill: `workspace-moa/skills/verify-statement/SKILL.md`
-  SOUL.md обновлены: compliance + kyc агенты
+  Skills: verify-statement + auto-verify (GAP 1, 2026-04-05) + marble-cases
+  SOUL.md: ШАГ 3 авто-верификация добавлен (2026-04-05)
+  AGENTS.md: Auto-Verify Rule (MANDATORY) добавлен (deploy-gap1-auto-verify.sh)
+  HITL Bridge: scripts/hitl-bridge.sh → Marble :5002 + Telegram (GAP 2, 2026-04-05)
+  Promptfoo cron: /etc/cron.d/banxe-promptfoo-eval — воскресенье 04:00 (GAP 3, 2026-04-05)
   Cron adversarial sim: /etc/cron.d/banxe-adversarial (вс 02:00)
