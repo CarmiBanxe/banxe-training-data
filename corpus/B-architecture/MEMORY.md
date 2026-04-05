@@ -104,9 +104,14 @@
 
 - DONE: Security hardening, GTT unlock (59392MB), ROCm, qwen3:30b-a3b, Sanctions policy, Verification env, SOUL.md deployment (chattr +i + soul-protected + SOUL GUARD в autosync)
 - DONE (2026-04-05): GAP 1 auto-verify skill, GAP 2 HITL bridge, GAP 3 promptfoo cron
+- DONE (2026-04-05): GAP 4 scenarios bank (160+ сценариев) + feedback_loop.py + train-agent.sh
+- DONE (2026-04-05): GAP 5 drift monitoring cron (6ч) + deploy-gap5-drift-monitor.sh
+- DONE (2026-04-05): banxe-architecture репо (локально) + publish-architecture-repo.sh
+- DONE (2026-04-05): verify-statement/SKILL.md добавлен в deploy-gap1-auto-verify.sh [2/5]
+- PENDING: Опубликовать banxe-architecture → `bash scripts/publish-architecture-repo.sh` (после `! gh auth login`)
+- PENDING: Задеплоить GAP 5 → `bash scripts/deploy-gap5-drift-monitor.sh`
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
-- PENDING (следующая сессия): verify-statement SKILL.md → workspace (добавить копирование в deploy-gap1 или deploy-backlog-phase16.sh)
-- PENDING (следующая сессия): GAP 4 feedback loop RAG, GAP 5 realtime drift 6ч, GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
+- PENDING: GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
   Thinking подавлено через пустой <think></think> в Modelfile + thinkingDefault:"off" в openclaw.json.
   Действие не требуется — механизм работает корректно.
@@ -224,6 +229,77 @@ ClickHouse:9000 → FCA audit trail         always
   → экспортирует `banxe.audit_trail` → `docs/training-exports/decisions-YYYY-MM.jsonl`
   → workflow подберёт при следующем push
 # workflow verified 2026-04-04T21:11:15Z
+
+## Architecture Repository (2026-04-05)
+
+- Репо: `CarmiBanxe/banxe-architecture` (приватный)
+- Назначение: единственный источник истины для архитектурных решений
+- Все проекты ОБЯЗАНЫ соответствовать
+- Структура: INVARIANTS.md, PRIVILEGE-MODEL.md, COMPLIANCE-ARCH.md, SANCTIONS-POLICY.md, STACK-LAYERS.md, SOUL-TEMPLATE.md, SERVICE-MAP.md, DEFERRED-PROJECTS.md, decisions/ (3 ADR), validators/check-compliance.sh
+- Проверка проекта: `bash validators/check-compliance.sh ~/vibe-coding`
+- Публикация: `bash scripts/publish-architecture-repo.sh` (после `gh auth login`)
+
+## Архитектурные ограничения (Canon 2026-04-05)
+
+### Модель привилегий — КАНОН
+- **РАЗРАБОТЧИК** (developer/CTIO): изменяет SOUL.md, SKILL.md, AGENTS.md, openclaw.json, запускает train-agent.sh, promptfoo eval, adversarial sim, feedback_loop.py --apply, изменяет thresholds/forbidden_patterns
+- **ОПЕРАТОР-ДУБЛЁР** (MLRO): видит алерты, принимает HITL-решения в Telegram и Marble UI, управляет кейсами — НЕ может менять поведение агента
+
+### Терминалы оператора
+- Терминал 1: Telegram `@mycarmi_moa_bot` — алерты + HITL + compliance справки
+- Терминал 2: **Marble UI (:5003)** — РЕКОМЕНДОВАН для MLRO (case queue, SAR review, audit trail)
+- n8n (:5678) — developer-only, не для оператора
+- OpenClaw :18789 — дублирует Telegram, не нужен как второй терминал
+
+### Telegram-бот — НЕ банковское приложение (ADR-002)
+Текущий бот = терминал оператора. Клиентский бот (платежи, KYC, баланс) = ОТДЕЛЬНЫЙ проект, отложен.
+
+### Отложенные проекты
+Telegram-бот (клиентский), Web-app Banxe, мобильное приложение — отдельные инсталляции, не делать сейчас. Зафиксированы в `banxe-architecture/DEFERRED-PROJECTS.md`.
+
+## GAP 5: Drift Monitoring (2026-04-05)
+
+- Script: `scripts/run-drift-monitor.sh` → `/data/vibe-coding/scripts/run-drift-monitor.sh`
+- Cron: `/etc/cron.d/banxe-drift-monitor` — каждые 6 часов (`0 */6 * * *`)
+- Метрики: composite_drift = avg_drift×0.4 + refuted_rate×0.4 + flag_rate×0.2
+- Evidently AI: используется если доступен, иначе heuristic
+- Alert threshold: 0.15 → Telegram → 508602494
+- Отчёты: `/data/banxe/promptfoo/compliance/training/drift-reports/`
+- latest: `drift_latest.json`
+- Деплой: `bash scripts/deploy-gap5-drift-monitor.sh`
+
+## Agent Training System (GAP 4, 2026-04-05)
+
+### Сценарный банк (developer-core)
+- `~/developer/compliance/training/scenarios/` — 160+ сценариев для 5 ролей
+  - kyc_specialist.json: 50 сценариев (A:20, B:10, C:10, D:5, E:5)
+  - aml_analyst.json: 40 сценариев (A:15, B:10, C:8, D:4, E:3)
+  - compliance_officer.json: 30 сценариев (A:10, B:6, C:8, D:3, E:3)
+  - risk_manager.json: 20 сценариев (A:8, B:4, C:4, D:2, E:2)
+  - crypto_aml.json: 20 сценариев (A:10, B:4, C:6, D:2, E:2)
+- Категории: A=жёсткие правила, B=граничные кейсы, C=красные линии, D=роутинг, E=неопределённость
+- `expected_consensus` = compliance ground truth (не текущее поведение верификатора)
+
+### Feedback Loop
+- `~/developer/compliance/training/feedback_loop.py`
+- Читает corpus_*.jsonl REFUTED записи, генерирует патчи:
+  - forbidden_pattern → вставляет regex в `_FORBIDDEN_PATTERNS` в compliance_validator.py
+  - soul_update → добавляет правило в SOUL.md под "СТРОГО ЗАПРЕЩЕНО"
+  - agents_update → информационно (применять вручную на GMKtec)
+- Режимы: `--report` (только показать) / `--apply` (применить + git push)
+- Дедупликация: пропускает уже присутствующие паттерны/правила
+
+### Скрипты (vibe-coding)
+- `scripts/train-agent.sh` — запуск обучения из терминала
+  - `bash scripts/train-agent.sh --agent kyc-specialist-v2 [--rounds N] [--categories A,B,C] [--feedback] [--deploy]`
+  - Верификация локально на Legion (не нужен SSH), репорт по категориям
+  - Сохраняет: data/training-results/<agent>_<ts>.json + corpus JSONL
+- `scripts/apply-feedback.sh` — standalone обёртка для feedback_loop.py
+  - `bash scripts/apply-feedback.sh [--report|--apply] [--since YYYY-MM-DD] [--agent <id>]`
+
+### Corpus
+- Legion: `~/developer/compliance/training/corpus/corpus_<agent>_<ts>.jsonl`
+- Структура: interaction_id, agent_id, statement, expected_consensus, consensus, correction_source, drift_score, training_flag
 
 ## HITL Bridge (2026-04-05)
 
