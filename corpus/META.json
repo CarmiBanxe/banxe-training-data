@@ -1,22 +1,23 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "3ada0c49a54b100ba69948789e27921d9a94b0ea",
-  "source_message": "feat(gates): G-09 Redis Pre-Transaction Gate — fast-path <80ms, 28 tests
+  "source_commit": "b7d9b882e059447149f695c334a4fabb335711b5",
+  "source_message": "feat(scripts): Sprint 6 production deploy + verification scripts
 
-- pre_tx_gate.py: PreTxGate with 4 ordered checks against Redis:
-  1. EMERGENCY_STOP (banxe:emergency_stop KEY) → BLOCK
-  2. JURISDICTION (banxe:blocked_jurisdictions SET) → BLOCK (SAMLA 2018)
-  3. SANCTIONS_CACHE (banxe:sanctions_hits SET) → BLOCK
-  4. VELOCITY (banxe:velocity:{customer_id} ZSET, 24h/£25K) → ESCALATE
-- GateDecision frozen dataclass: PASS/BLOCK/ESCALATE + rule_id + latency_ms
-- InMemoryRedisStub: thread-safe, implements full Redis subset for unit tests
-- Fail-open: Redis unavailable → ESCALATE (never blocks business)
-- SLA: logs WARNING if total latency >80ms
-- sync_blocked_jurisdictions(): loads from compliance_config.yaml into Redis SET
-- sync_sanctions_cache(): populates confirmed hits into Redis SET
+- deploy-sprint6.sh: 8-step deployment to GMKtec
+  1. git pull --rebase
+  2. rsync compliance source via SSH
+  3. Redis blocked jurisdictions sync
+  4. PostgreSQL decision_events verification
+  5. Emergency stop endpoint check
+  6. FastAPI service restart
+  7. Pre-tx gate + JIT credentials smoke tests
+  8. Compliance snapshot ZIP to /tmp/audit-YYYY-MM-DD.zip
+- verify-production.sh: 14 post-deploy checks across 5 categories
+  (core services / infra / compliance stack / AI stack / security / audit)
+  exits 0 if all critical checks pass, 1 otherwise
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-05T21:17:00Z",
+  "extracted_at": "2026-04-05T21:20:12Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
