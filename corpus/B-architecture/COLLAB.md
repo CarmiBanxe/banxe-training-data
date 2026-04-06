@@ -61,7 +61,7 @@ YOU → Claude Code (architect/orchestrator)
 ├── Ollama :11434 (qwen3-30b, qwen3-banxe, glm-4-flash, gpt-oss-20b)
 ├── LiteLLM :4000 (OpenAI-совместимый роутер ко всем моделям)
 ├── OpenClaw Bots :18789 / :18791 / :18793
-└── MiroFish :3000 (после деплоя)
+└── MiroFish :3001 (frontend UI) / :5004 (backend API)
          │
          ▼
 [Ruflo Orchestrator] ← enterprise multi-step coordination layer
@@ -96,7 +96,7 @@ YOU → Claude Code (architect/orchestrator)
 | 1 | **Claude Code** | Architect, reviewer, orchestrator | `claude` |
 | 2 | **Ruflo** | Multi-step flow orchestrator | `ruflo/start-ruflo.sh` |
 | 3 | **Aider CLI** | Sole code executor | `scripts/aider-banxe.sh` |
-| 4 | **MiroFish** | Behavioural + regulatory simulator | `:3000/api` |
+| 4 | **MiroFish** | Behavioural + regulatory simulator | `:3001` (UI) / `:5004/health` (API) |
 
 **LiteLLM** = infrastructure model routing layer — not a partner.  
 **MetaClaw/OpenClaw** = platform layer — not a partner.
