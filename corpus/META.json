@@ -1,19 +1,27 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "f4427047b951b2cc4f6c76e7a0cff22b55638fb1",
-  "source_message": "docs: MEMORY.md Sprint 9 — BANXE AI Stack v2.0
+  "source_commit": "4968cb8cca2d885e9151187dd384969e9a65ff1c",
+  "source_message": "docs: GAP-6 autoresearch + HITL Dashboard spec + MEMORY.md update
 
-- Header: Sprint 9 DONE
-- Services table: LiteLLM :4000, MiroFish :3001/:5004 added
-- New section: BANXE AI Stack v2.0 (Four-Partner Swarm)
-  - Partners table (Claude Code / Ruflo / Aider CLI / MiroFish)
-  - LiteLLM as infrastructure layer, Qoder removed
-  - Key artifacts table (ruflo, aider-banxe, parallel-verify, COLLAB v4.0)
-  - MiroFish deploy facts (ports, health endpoint, restart command)
-  - CANON system summary
+GAP-6 (docs/GAP-6-AUTORESEARCH.md):
+- AutoResearchClaw pipeline documentation (23 stages, 8 phases)
+- Banxe research topics: AML thresholds, Watchman FP rate, SAR tuning
+- Config fix: LiteLLM :4000 / qwen3-30b (replaces removed qwen3.5-abliterated)
+- MetaClaw bridge + production integration rules
+
+HITL Dashboard (docs/HITL-DASHBOARD-SPEC.md):
+- Full tech spec: React/FastAPI/ClickHouse/Telegram
+- hitl_queue schema (TTL 5Y, FCA compliant)
+- API endpoints: GET/POST /hitl/queue, WebSocket stream
+- MVP definition (ClickHouse + FastAPI + Telegram bot)
+- SLA: MEDIUM 4h / HIGH 1h / sanctions=immediate
+
+MEMORY.md:
+- GAP 6, HITL Dashboard, collaboration archive → DONE
+- CTIO bot + Vendor API remain PENDING
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T07:38:02Z",
+  "extracted_at": "2026-04-06T07:42:35Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
