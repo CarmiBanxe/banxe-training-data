@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "d2edb3cf70f4e7c328c146bf1f51441f322b34a5",
-  "source_message": "docs: MEMORY.md Sprint 8 — sync actual status, CANON section, updated scores",
-  "extracted_at": "2026-04-06T00:00:02Z",
+  "source_commit": "2cfda290abb1f34a89a52ffcc52edeeb6be8ae6f",
+  "source_message": "sync: CANON update — KA-01..KA-10, preflight hook, developer-core@aca6d51",
+  "extracted_at": "2026-04-06T00:02:16Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
