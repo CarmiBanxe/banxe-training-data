@@ -1,22 +1,19 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "a7ed6efda3c0a04ff27cf0d72351a9835f420db1",
-  "source_message": "sync: Update shared stack from developer-core
+  "source_commit": "f4427047b951b2cc4f6c76e7a0cff22b55638fb1",
+  "source_message": "docs: MEMORY.md Sprint 9 — BANXE AI Stack v2.0
 
-Components updated:
-- AGENTS.md (three-partner synergy)
-- .qoder/context.md (UNIVERSAL — Claude + Qoder + MiroFish)
-- docs/COLLAB.md
-- docs/MCP-BEST-PRACTICES.md
-- .qoder/config.yml
-- scripts/check-agent-instructions.sh
-- docs/MIROFISH-SCENARIOS.md (project-specific)
+- Header: Sprint 9 DONE
+- Services table: LiteLLM :4000, MiroFish :3001/:5004 added
+- New section: BANXE AI Stack v2.0 (Four-Partner Swarm)
+  - Partners table (Claude Code / Ruflo / Aider CLI / MiroFish)
+  - LiteLLM as infrastructure layer, Qoder removed
+  - Key artifacts table (ruflo, aider-banxe, parallel-verify, COLLAB v4.0)
+  - MiroFish deploy facts (ports, health endpoint, restart command)
+  - CANON system summary
 
-Source: ~/developer/ (MASTER)
-Synced via: sync-all.sh
-
-🤖 Generated with [Qoder][https://qoder.com]",
-  "extracted_at": "2026-04-06T01:59:22Z",
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-06T07:38:02Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
