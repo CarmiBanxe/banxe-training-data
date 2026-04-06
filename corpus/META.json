@@ -1,17 +1,16 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "08757b592f185049055f3225e3972240ce9ee31a",
-  "source_message": "fix(DEF-002): healthcheck disable for distroless/static midaz-ledger
+  "source_commit": "de052046c7e31f58d40921c1155bbac0dc6dfeb4",
+  "source_message": "feat(I-28): Instruction Ledger System — il_gate hook, KA-11, EXECUTION DISCIPLINE
 
-lerianstudio/midaz-ledger:latest = distroless/static-debian12.
-No curl/shell/musl available. curl layer approach fails (static binary incompatibility).
-Final approach: disable: true + external cron monitor every 2min.
-
-External: curl http://127.0.0.1:8095/health | logger midaz-health
-API verified healthy. Deviation IL-001 logged.
+- .claude/CLAUDE.md: EXECUTION DISCIPLINE rule (first thing Claude reads)
+- .claude/hooks/il_gate.py: PreToolUse gate, blocks when >3 open ILs
+- .claude/settings.json: il_gate registered on Edit|Write|Bash
+- canon/modules/CORE.md: KA-11 Execution Discipline canon
+- .claude/hooks/load_architecture.py: IL open count in session header
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T14:25:41Z",
+  "extracted_at": "2026-04-06T14:50:03Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
