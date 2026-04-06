@@ -1,6 +1,6 @@
 # MEMORY.md — Banxe AI Bank
 
-> Последнее обновление: 2026-04-03. Phase 2b Marble deployed. Роутинг агентов → см. AGENTS.md
+> Последнее обновление: 2026-04-06. Sprint 8 sync: MEMORY.md updated, CANON deployed, 22/22 GAPs DONE.
 
 ## Инфраструктура
 
@@ -116,10 +116,10 @@
 - DONE (2026-04-05): scenario_registry engines bindings — case_orchestrator SCN-001 + ML sanctions SCN-002 (38637ec)
 - DONE (2026-04-05): sanctions_check.py ADR-009 routing — Yente :8086 primary → Watchman :8084 fallback → local fuzzy (119c357)
 - DONE (2026-04-05): emergency_stop.py + api.py — EU AI Act Art.14 stop button (d5c1007), syntax OK
-- [PAUSED, PRIORITY #1] Stop button endpoint — тесты не написаны, Marble UI кнопка не подключена, production deploy не выполнен. Возобновить первым при возврате к коду.
-- [PAUSED] ExplanationBundle runtime (XAI, EU AI Act + FCA PS7/24)
-- [PAUSED] compliance_config.yaml externalization (12-Factor Factor III)
-- [PAUSED] Bounded Context context.yaml (import boundaries, DDD)
+- [DONE, Sprint 3] Stop button endpoint — G-03 DONE: EmergencyPort, emergency_stop.py, API, Marble panel
+- [DONE, Sprint 2] ExplanationBundle runtime (XAI, EU AI Act + FCA PS7/24) — G-02 DONE
+- [DONE, Sprint 2] compliance_config.yaml externalization (12-Factor Factor III) — G-07 DONE
+- [DONE, Sprint 4] Bounded Context context.yaml (import boundaries, DDD) — G-18 DONE
 - PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
 - PENDING: GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
@@ -377,18 +377,18 @@ Telegram-бот (клиентский), Web-app Banxe, мобильное при
 Полный реестр: `banxe-architecture/GAP-REGISTER.md` (22 пробела: P1×7, P2×11, P3×4).
 Sprint 0 план: `banxe-architecture/SPRINT-0-PLAN.md` (Ports, Bounded Contexts, Hooks, AIGF mapping).
 
-### Оценки по принципам
-| Принцип | Оценка | Главный gap |
+### Оценки по принципам (обновлено 2026-04-06)
+| Принцип | Оценка | Статус |
 |---|---|---|
-| AI-Native / Deterministic Bridge | 7/10 | ExplanationBundle не реализован (G-02) |
-| Policy-as-Code | 8/10 | compliance_config.yaml не создан (G-07) |
-| CQRS + Event Sourcing | 4/10 | Нет Decision Event Log (G-01) |
-| HITL / EU AI Act Art.14 | 5/10 | Stop button partial, дедлайн 2026-08-02 (G-03) |
-| DDD / Bounded Contexts | 3/10 | Описан, не enforced в коде (G-06) |
+| AI-Native / Deterministic Bridge | 9/10 | G-02 + G-12 + G-14 DONE |
+| Policy-as-Code | 10/10 | G-19 OPA/Rego DONE |
+| CQRS + Event Sourcing | 9/10 | G-01 + G-17 DONE |
+| HITL / EU AI Act Art.14 | 9/10 | G-03 DONE (emergency_stop + api + panel) |
+| DDD / Bounded Contexts | 8/10 | G-06 + G-18 DONE |
 | Microservices / SoC | 6/10 | Process-level isolation только у Yente |
-| 12-Factor | 5/10 | Factor III нарушен (G-07) |
-| XAI | 0/10 | Полностью отсутствует (G-02) |
-| Multi-agent trust | 2/10 | Нет Orchestration Tree (G-04), нет Class B gate (G-05) |
+| 12-Factor | 9/10 | G-07 + G-20 DONE |
+| XAI | 7/10 | G-02 DONE (ExplanationBundle) |
+| Multi-agent trust | 9/10 | G-04 + G-05 + G-10 + G-11 DONE |
 
 ### Новые инварианты (I-21..I-25)
 Добавлены в `banxe-architecture/INVARIANTS.md`:
@@ -403,14 +403,10 @@ Sprint 0 план: `banxe-architecture/SPRINT-0-PLAN.md` (Ports, Bounded Context
 - `banxe-architecture/governance/change-classes.yaml` — Class A/B/C/D с approval gates
   - CLASS_B_SOUL_AGENTS: feedback_loop can_apply=NEVER, unanimous MLRO+CTO required
 
-### Sprint план (приоритет при возврате к коду)
-0. Sprint 0 (архитектурный): Ports & Adapters + Bounded Contexts + 4 Claude Hooks + AIGF mapping
-   Файл: `banxe-architecture/SPRINT-0-PLAN.md`
-1. G-03 [PAUSED, PRIORITY #1]: Завершить stop button → EmergencyPort adapter
-2. G-16: PolicyPort, DecisionPort, AuditPort, EmergencyPort спецификации
-3. G-02: ExplanationBundle в risk_contract.py → DecisionPort output
-4. G-01: Decision Event Log (PostgresEventLogAdapter)
-5. G-07: compliance_config.yaml → ComplianceConfigAdapter
+### Sprint план (обновлено 2026-04-06)
+- Sprint 0–7: ALL DONE (22/22 GAP, 663 tests, CANON system deployed)
+- Sprint 8 (текущий): MEMORY.md sync + CANON hooks integration
+- Pending: Phase 3 KYC (PassportEye + DeepFace), CTIO бот, GAP-REGISTER пересмотр 2026-07-01
 
 ### Новые gaps из v3 (G-16..G-22)
 - G-16 (P1): Hexagonal Architecture — нет Ports & Adapters
@@ -420,6 +416,15 @@ Sprint 0 план: `banxe-architecture/SPRINT-0-PLAN.md` (Ports, Bounded Context
 - G-20 (P2): 12-Factor — нет release pipeline + structured logging
 - G-21 (P2): Нет зонирования AI-генерации в Claude Code hooks
 - G-22 (P3): FINOS AIGF v2.0 mapping — PARTIAL (таблица в SPRINT-0-PLAN.md)
+
+## CANON System (Sprint 7, 2026-04-06)
+
+- Расположение: `canon/` (видимая директория) в developer-core, vibe-coding, banxe-architecture
+- Структура: `canon/CANON.md` (index), `canon/modules/` (6 модулей), `canon/rules/`, `canon/scripts/`
+- Модули: CORE.md (12 разделов, 234 строки), FR_MODULE.md (16 разделов, 400 строк), DEV.md, DOC.md, LEGAL.md, DECISION.md
+- Профили: DEV (без юридических блоков) — основной для BANXE; LEGAL+FR (с FR_MODULE) — для юридических проектов (guiyon, ss1)
+- Источник: CORE_CANON v5.1.8a + FR_MODULE v17 из Google Drive CHATGPT_CANON
+- Коммиты: developer-core@25c2d37, vibe-coding@70ef5dd, banxe-architecture@4f2e8ac
 
 ## Policy Provenance (2026-04-05)
 
