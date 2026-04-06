@@ -123,8 +123,11 @@
 - [DONE, Sprint 2] ExplanationBundle runtime (XAI, EU AI Act + FCA PS7/24) — G-02 DONE
 - [DONE, Sprint 2] compliance_config.yaml externalization (12-Factor Factor III) — G-07 DONE
 - [DONE, Sprint 4] Bounded Context context.yaml (import boundaries, DDD) — G-18 DONE
-- PENDING: CTIO бот (ждём token), Vendor API, HITL Dashboard
-- PENDING: GAP 6 autoresearch program.md, GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
+- PENDING: CTIO бот (ждём token от Олега), Vendor API (ждём вендоров)
+- PENDING: GAP 7 OpenRLHF pipeline, GAP 8 TinyTroupe/AMLSim — не блокирующие
+- DONE (2026-04-06): GAP 6 autoresearch — docs/GAP-6-AUTORESEARCH.md (config fix: LiteLLM :4000, qwen3-30b)
+- DONE (2026-04-06): HITL Dashboard spec — docs/HITL-DASHBOARD-SPEC.md (MVP: hitl_queue CH + FastAPI + Telegram)
+- DONE (2026-04-06): CarmiBanxe/collaboration — заархивирован на GitHub
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
   Thinking подавлено через пустой <think></think> в Modelfile + thinkingDefault:"off" в openclaw.json.
   Действие не требуется — механизм работает корректно.
