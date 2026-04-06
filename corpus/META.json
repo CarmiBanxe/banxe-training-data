@@ -1,27 +1,15 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "4968cb8cca2d885e9151187dd384969e9a65ff1c",
-  "source_message": "docs: GAP-6 autoresearch + HITL Dashboard spec + MEMORY.md update
+  "source_commit": "6ecff31c013ff03ee36fd823db12017698d6d83a",
+  "source_message": "feat(G-02): auto-trigger ExplanationBundle for transactions ≥ £10,000 (FCA SS1/23 / I-25)
 
-GAP-6 (docs/GAP-6-AUTORESEARCH.md):
-- AutoResearchClaw pipeline documentation (23 stages, 8 phases)
-- Banxe research topics: AML thresholds, Watchman FP rate, SAR tuning
-- Config fix: LiteLLM :4000 / qwen3-30b (replaces removed qwen3.5-abliterated)
-- MetaClaw bridge + production integration rules
-
-HITL Dashboard (docs/HITL-DASHBOARD-SPEC.md):
-- Full tech spec: React/FastAPI/ClickHouse/Telegram
-- hitl_queue schema (TTL 5Y, FCA compliant)
-- API endpoints: GET/POST /hitl/queue, WebSocket stream
-- MVP definition (ClickHouse + FastAPI + Telegram bot)
-- SLA: MEDIUM 4h / HIGH 1h / sanctions=immediate
-
-MEMORY.md:
-- GAP 6, HITL Dashboard, collaboration archive → DONE
-- CTIO bot + Vendor API remain PENDING
+- Import ExplanationBundle in api.py
+- transaction_check: if req.amount >= 10_000, call from_banxe_result() and embed
+  explanation in response
+- 74 tests pass (17 G-03 + 39 phase15 + 18 suite)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T07:42:35Z",
+  "extracted_at": "2026-04-06T07:58:40Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }

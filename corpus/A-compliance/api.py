@@ -36,6 +36,7 @@ from models          import TransactionInput        # for TransactionRequest map
 from sar_generator   import generate_sar
 from audit_trail     import log_screening, get_screening_history, get_stats, setup_schema
 from emergency_stop  import activate_stop, clear_stop, get_stop_state, require_not_stopped
+from utils.explanation_builder import ExplanationBundle
 try:
     from legal_databases import check_legal_exposure
     LEGAL_DB_AVAILABLE = True
@@ -349,6 +350,12 @@ async def transaction_check(
     if result.get("flagged"):
         sender_check = await check_sanctions(req.from_name)
         result["sender_sanctions"] = sender_check.get("sanctioned", False)
+
+    # I-25: ExplanationBundle required for transactions ≥ £10,000 (FCA SS1/23)
+    if req.amount >= 10_000:
+        result["explanation"] = ExplanationBundle.from_banxe_result(
+            result, amount_gbp=req.amount
+        ).model_dump()
 
     return result
 
