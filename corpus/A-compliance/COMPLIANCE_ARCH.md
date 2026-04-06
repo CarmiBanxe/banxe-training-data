@@ -3,7 +3,7 @@
 **Version:** Phase 16 (05.04.2026)  
 **Canonical repo:** `github.com/CarmiBanxe/vibe-coding` → `src/compliance/`  
 **Runtime:** `/data/banxe/compliance/` on GMKtec (192.168.0.72)  
-**API:** FastAPI `:8090` | **Service:** `banxe-api.service`
+**API:** FastAPI `:8093` | **Service:** `banxe-api.service`
 
 ---
 
@@ -245,7 +245,7 @@ Jube TM (AGPLv3, `:5001`) handles the probabilistic ML layer. The above modules 
 
 ---
 
-## API endpoints (FastAPI `:8090`)
+## API endpoints (FastAPI `:8093`)
 
 ```
 POST /api/v1/screen/person      Sanctions + PEP + AMI [+ EDD if score ≥ 40]
