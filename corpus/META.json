@@ -1,19 +1,19 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "35a9a9a18eef10d1fdf4cc160921bda3abd4e33f",
-  "source_message": "fix(DEF-001): Compliance API port :8090→:8093, add sar_generator.py
+  "source_commit": "86cb95ff5264364f646fe9858eb1a53c3313c726",
+  "source_message": "feat(BLOCK-A): Midaz CBS docker-compose, local build from source
 
-- banxe-api.service: --port 8090 → --port 8093 (on GMKtec)
-- Created src/compliance/sar_generator.py (missing module, caused import crash)
-- Updated docs: COMPLIANCE_ARCH, HITL-DASHBOARD-SPEC, MEMORY
-- ADR-012 in banxe-architecture: I-18 resolved (GUIYON:8090 / BANXE:8093 separated)
-- tf-keras installed in compliance-env (DeepFace dependency fix)
+- docker-compose.midaz.yml: Midaz ledger + MongoDB + RabbitMQ
+- Variant 2: reuse existing postgres:17 and redis-stack
+- Local image: banxe/midaz-ledger:local (built from git clone)
+- Port mapping: :8095 → Midaz internal :3002
+- PostgreSQL setup: midaz_onboarding + midaz_transaction + midaz_app user
+- .env.midaz on GMKtec (secrets not committed)
 
-Verification: curl http://127.0.0.1:8093/api/v1/health → degraded (yente unreachable)
-I-23: emergency-stop/status → active:false ✅
+Build in progress on GMKtec: docker build -f components/ledger/Dockerfile
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T11:18:39Z",
+  "extracted_at": "2026-04-06T12:38:06Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
