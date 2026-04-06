@@ -1,12 +1,14 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "2b82e0eb6bb2d52d805d77fae8de48b6b47c4118",
-  "source_message": "feat(compliance): add LedgerPort ABC + MidazLedgerAdapter for Sprint 8 BLOCK-A
+  "source_commit": "9e5ea7eea6d5c7b13109c5339dc43554b7382aa0",
+  "source_message": "fix(DEF-002): midaz-ledger custom image + curl healthcheck (distroless fix)
 
-Implements ADR-013: Midaz v3.5.3 as PRIMARY CBS adapter with 14 passing tests.
+lerianstudio/midaz-ledger uses distroless/static-debian12 — no curl.
+Add curl layer via Dockerfile.midaz-healthcheck multi-stage build.
+midaz-ledger-banxe:latest = base + curl binary from alpine/curl.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T13:41:13Z",
+  "extracted_at": "2026-04-06T14:04:45Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
