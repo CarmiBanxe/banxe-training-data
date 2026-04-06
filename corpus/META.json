@@ -1,10 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "c6045c21f479c4ff6b780b22d654b2cb0a2e435d",
-  "source_message": "sync: MiroFish endpoint fix — :5004/health (from developer-core c8a094d)
+  "source_commit": "a7ed6efda3c0a04ff27cf0d72351a9835f420db1",
+  "source_message": "sync: Update shared stack from developer-core
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T01:52:13Z",
+Components updated:
+- AGENTS.md (three-partner synergy)
+- .qoder/context.md (UNIVERSAL — Claude + Qoder + MiroFish)
+- docs/COLLAB.md
+- docs/MCP-BEST-PRACTICES.md
+- .qoder/config.yml
+- scripts/check-agent-instructions.sh
+- docs/MIROFISH-SCENARIOS.md (project-specific)
+
+Source: ~/developer/ (MASTER)
+Synced via: sync-all.sh
+
+🤖 Generated with [Qoder][https://qoder.com]",
+  "extracted_at": "2026-04-06T01:59:22Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
