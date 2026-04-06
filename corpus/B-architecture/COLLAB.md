@@ -1,50 +1,54 @@
-# COLLAB.md v3.0 — Single-Terminal Synergy
+# COLLAB.md v4.0 — Four-Partner Swarm Architecture
 
-**Pattern:** Claude Code + Qoder CLI automatic collaboration via MCP  
-**Repository:** `~/developer/` (and all downstream projects)  
-**Version:** 3.0 | 2026-04-03
+**Stack:** BANXE AI Stack v2.0  
+**Version:** 4.0 | 2026-04-06  
+**Repository:** `~/developer/` (and all downstream projects)
 
 ---
 
-## User Principle (The Only Rule You Need)
+## User Principle
 
 ```bash
-cd ~/project          # Any project directory
+cd ~/project
 claude
 ```
 
-**That is all.**
-
-No manual `qodercli` commands. No separate terminals. No coordination overhead.
+That is all. No manual executor commands. No separate terminals. No coordination overhead.
 
 ---
 
 ## What Happens Under The Hood
 
 ```
-YOU → CLAUDE (designs/reviews) → QODER via MCP (implements) → CLAUDE (verifies) → YOU
+YOU → Claude Code (architect/orchestrator)
+         ├── Ruflo        (multi-step orchestration)
+         ├── Aider CLI    (code execution — sole executor)
+         └── MiroFish     (behavioural simulation)
+              ↓
+         Claude Code (synthesis + review) → YOU
 ```
 
 ### Automatic flow
 
 1. **You start Claude** in project directory
-2. **Claude reads** project instructions (AGENTS.md, CLAUDE.md, etc.)
-3. **Claude delegates** execution to Qoder via MCP automatically
-4. **Qoder executes** within repository boundaries
-5. **Claude reviews** results and presents unified outcome
+2. **Claude reads** project instructions (CANON → CLAUDE.md → AGENTS.md)
+3. **Claude delegates** code execution to Aider CLI via LiteLLM automatically
+4. **Ruflo orchestrates** multi-step flows when needed
+5. **MiroFish simulates** regulatory / fraud / behavioural edge cases on trigger
+6. **Claude reviews** all results and presents unified outcome
 
 ### You see
 
 - Clean result presentation
 - What was analyzed
-- What was changed
-- What was verified
+- What was changed / executed
+- What was verified (parallel-verify.sh consensus)
 - What risks remain
 
 ### You don't see
 
-- MCP protocol details
-- Qoder invocation commands
+- LiteLLM routing internals
+- Aider invocation commands
 - Internal agent coordination
 - Context loading complexity
 
@@ -53,72 +57,49 @@ YOU → CLAUDE (designs/reviews) → QODER via MCP (implements) → CLAUDE (veri
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                   USER TERMINAL                      │
-│                                                      │
-│  cd ~/project                                        │
-│  claude                                              │
-│                                                      │
-│  ┌──────────────────────────────────────────────┐   │
-│  │        Claude Code (coordinator)             │   │
-│  │  • Reads project context                     │   │
-│  │  • Designs architecture                      │   │
-│  │  • Reviews output                            │   │
-│  │  • Presents results                          │   │
-│  └──────────────────────────────────────────────┘   │
-│                        ↓ MCP call                    │
-│  ┌──────────────────────────────────────────────┐   │
-│  │        Qoder CLI mcp-server (executor)       │   │
-│  │  • Loaded automatically from settings.json   │   │
-│  │  • Reads .qoder/config.yml                   │   │
-│  │  • Executes commands                         │   │
-│  │  • Edits files                               │   │
-│  │  • Runs tests                                │   │
-│  └──────────────────────────────────────────────┘   │
-│                        ↓                             │
-│  Repository (isolated scope)                        │
-└─────────────────────────────────────────────────────┘
+[MetaClaw/OpenClaw Platform — GMKtec сервер]
+├── Ollama :11434 (qwen3-30b, qwen3-banxe, glm-4-flash, gpt-oss-20b)
+├── LiteLLM :4000 (OpenAI-совместимый роутер ко всем моделям)
+├── OpenClaw Bots :18789 / :18791 / :18793
+└── MiroFish :3000 (после деплоя)
+         │
+         ▼
+[Ruflo Orchestrator] ← enterprise multi-step coordination layer
+         │
+         ▼
+┌─────────────────────────────────────────────────┐
+│            PARTNER SYNERGY v2.0                 │
+│                                                 │
+│  Claude Code = Архитектор/Координатор           │
+│  ├── subagents = параллельные работники         │
+│  ├── Aider CLI = Исполнитель (код + git)        │
+│  │   └── через LiteLLM :4000                   │
+│  ├── MiroFish = Симулятор/Adversarial           │
+│  │   └── через Ollama (qwen3-banxe backend)     │
+│  └── parallel-verify.sh = 3-модельная проверка  │
+│      └── через LiteLLM :4000                   │
+│                                                 │
+│  [Ruflo] = оркестратор multi-step потоков       │
+│  └── координирует всех партнёров                │
+└─────────────────────────────────────────────────┘
+         │
+         ▼
+[OpenClaw Bots — production deploy target]
 ```
 
 ---
 
-## Configuration (Pre-Integrated)
+## Partners (exactly four)
 
-### Global MCP setup (~/.claude/settings.json)
+| # | Partner | Role | Entry point |
+|---|---------|------|-------------|
+| 1 | **Claude Code** | Architect, reviewer, orchestrator | `claude` |
+| 2 | **Ruflo** | Multi-step flow orchestrator | `ruflo/start-ruflo.sh` |
+| 3 | **Aider CLI** | Sole code executor | `scripts/aider-banxe.sh` |
+| 4 | **MiroFish** | Behavioural + regulatory simulator | `:3000/api` |
 
-```json
-{
-  "skipDangerousModePermissionPrompt": true,
-  "mcpServers": {
-    "qoder": {
-      "type": "stdio",
-      "command": "qodercli",
-      "args": ["mcp-server"]
-    }
-  }
-}
-```
-
-**Why stdio:** Lowest latency, no network overhead, direct process communication.
-
-### Project Qoder config ({project}/.qoder/config.yml)
-
-```yaml
-# WSL optimizations
-wsl:
-  watchPolling: true
-  watchInterval: 1000
-  maxConcurrentOperations: 2
-
-# Auto-load context
-mcp:
-  loadContext: true
-  contextPaths:
-    - "AGENTS.md"
-    - ".qoder/context.md"
-    - "CLAUDE.md"
-    - "docs/COLLAB.md"
-```
+**LiteLLM** = infrastructure model routing layer — not a partner.  
+**MetaClaw/OpenClaw** = platform layer — not a partner.
 
 ---
 
@@ -127,15 +108,15 @@ mcp:
 Agents follow instructions in this priority order:
 
 1. **Explicit user instruction** (highest authority)
-2. **Repository-level contracts**:
+2. **CANON** (`~/developer/canon/`) — universal rules (CORE.md, DEV.md, FR_MODULE.md …)
+3. **Repository-level contracts**:
    - `CLAUDE.md` — project context
-   - `.qoder/context.md` — Qoder execution contract
-   - `AGENTS.md` — agent instructions
+   - `AGENTS.md` — agent execution instructions
    - `COLLAB.md` — this file
-   - `COMPLIANCE_ARCH.md` — compliance invariants
-3. **Global defaults**: `~/.claude/CLAUDE.md`
+   - `COMPLIANCE_ARCH.md` — compliance invariants (if applicable)
+4. **Global defaults**: `~/.claude/CLAUDE.md`
 
-**Rule:** Closer to working directory = higher priority.
+**Rule:** closer to working directory = higher priority. CANON sits above CLAUDE.md.
 
 ---
 
@@ -147,7 +128,7 @@ Agents follow instructions in this priority order:
 
 Agents must NEVER:
 - Read files outside current git root
-- Mix configs/secrets/context across repositories
+- Mix configs / secrets / context across repositories
 - Reuse artifacts from another project implicitly
 
 **Violation is a critical error, not a style issue.**
@@ -157,24 +138,25 @@ Agents must NEVER:
 If you explicitly request cross-project work:
 
 ```
-"Copy the sanctions_check.py module from vibe-coding to guiyon"
+"Copy the sanctions_check.py module from vibe-coding to developer"
 ```
 
 Then agents must:
 1. Confirm both repository names
 2. Work sequentially (one at a time)
 3. Maintain strict separation during each operation
+4. Request narrow, per-step permission for each repository
 
 ---
 
 ## When Collaboration is Visible
 
-Normally collaboration is invisible. It becomes visible only when:
+Normally collaboration is invisible. It becomes visible when:
 
-### Debugging failures
+### Aider execution failure
 
 ```
-Qoder failed to execute: pytest src/compliance/test_phase15.py
+Aider failed: pytest src/compliance/test_phase15.py
 Exit code: 1
 Stderr: ModuleNotFoundError: No module named 'clickhouse_driver'
 
@@ -182,27 +164,28 @@ Possible causes:
 1. Virtualenv not activated
 2. Dependency missing from requirements.txt
 3. Test path incorrect
-
-Recommendation: Run manually to diagnose:
-  cd /home/mmber/vibe-coding
-  source venv/bin/activate
-  pytest src/compliance/test_phase15.py -v
 ```
 
-### Review disagreements
+### Parallel verification disagreement
 
 ```
-Qoder suggests: Change minMatch from 0.80 to 0.90
+parallel-verify.sh result: 1/3 PASS → NEEDS REVIEW
+compliance model: PASS
+security model:   FAIL — hardcoded credential pattern detected
+alternative model: FAIL — same issue confirmed
+
+Action required: fix before commit.
+```
+
+### Review disagreement
+
+```
+Aider suggests: Change minMatch from 0.80 to 0.90
 Analysis: This violates COMPLIANCE_ARCH.md invariant #3
 
-Invariant #3 states:
-  "Watchman minMatch: 0.80 (Jaro-Winkler)"
+Invariant #3 states: "Watchman minMatch: 0.80 (Jaro-Winkler)"
 
-Change requires:
-- MLRO approval
-- Regression test on known cases
-- Documentation update
-
+Change requires: MLRO approval + regression test on known cases.
 Recommendation: Keep 0.80 unless explicit business decision made.
 ```
 
@@ -210,7 +193,7 @@ Recommendation: Keep 0.80 unless explicit business decision made.
 
 ## Compliance-Sensitive Operations
 
-If working in `src/compliance/` (vibe-coding):
+When working in `src/compliance/` (vibe-coding):
 
 ### Mandatory pre-flight
 
@@ -225,7 +208,6 @@ Cannot be changed without explicit user approval:
 3. **Watchman minMatch:** 0.80 (Jaro-Winkler)
 4. **ClickHouse TTL:** 5 YEAR (FCA MLR 2017 requirement)
 5. **Jube AGPLv3:** internal use only
-6. **GUIYON (port 18794):** categorically excluded from Banxe
 
 ### Decision thresholds (read-only by default)
 
@@ -250,20 +232,8 @@ Before marking task complete:
 | Compliance logic | Regression tests on known cases |
 | API endpoints | Endpoint smoke test + schema validation |
 | Infrastructure | Deploy script dry-run + health check |
+| Multi-agent flow | Subagent pattern compliance (docs/subagent-patterns.md) |
 | Documentation | Link check + build verification |
-
-### Test commands (vibe-coding example)
-
-```bash
-# Phase 15 unit tests (pytest, no network)
-pytest src/compliance/test_phase15.py -v
-
-# Phase 1-13 integration (custom asyncio runner)
-python3 src/compliance/test_suite.py
-
-# General repo tests
-pytest tests/ -v
-```
 
 ---
 
@@ -276,75 +246,6 @@ pytest tests/ -v
 | HIGH | Any | Human + Compliance officer |
 
 All decisions logged to ClickHouse for FCA audit trail.
-
----
-
-## Troubleshooting
-
-### Problem: Qoder not responding
-
-**Symptoms:** Claude waits indefinitely, no output
-
-**Diagnosis:**
-```bash
-ps aux | grep qodercli
-# Should show: qodercli mcp-server
-```
-
-**Fix:**
-```bash
-# Kill stuck process
-pkill -f "qodercli mcp-server"
-
-# Restart Claude session
-exit
-cd ~/project
-claude
-```
-
-### Problem: Context not loading
-
-**Symptoms:** Qoder ignores project rules
-
-**Check:**
-```bash
-cat ~/.qoder/config.yml
-ls -la AGENTS.md .qoder/context.md CLAUDE.md
-```
-
-**Verify loaded:**
-```bash
-bash scripts/check-agent-instructions.sh
-```
-
-### Problem: WSL hangs
-
-**Symptoms:** Filesystem watchers freeze, high CPU
-
-**Fix:** Ensure WSL optimizations in ~/.qoder/config.yml:
-```yaml
-wsl:
-  watchPolling: true
-  maxConcurrentOperations: 2
-  disableInterop: true
-```
-
----
-
-## Performance Tips
-
-### For large operations
-
-```bash
-# Parallel workers (when appropriate)
-# Claude will automatically use worktrees for independent tasks
-```
-
-### For slow operations
-
-- Increase timeout in config
-- Run in background with status checks
-- Break into smaller chunks
 
 ---
 
@@ -362,13 +263,7 @@ wsl:
 ```bash
 export BANXE_API_KEY="..."
 export CLICKHOUSE_PASSWORD="..."
-```
-
-### Token scoping (if using API)
-
-```bash
-export QODER_REPO_SCOPE=/home/mmber/vibe-coding
-export QODER_ALLOWED_COMMANDS="edit,run_test,read_file"
+export LITELLM_API_KEY="anything"
 ```
 
 ---
@@ -377,20 +272,21 @@ export QODER_ALLOWED_COMMANDS="edit,run_test,read_file"
 
 Before starting work in any project:
 
-- [ ] Global MCP config exists (`~/.claude/settings.json`)
-- [ ] Qoder configured as stdio server
-- [ ] Project has AGENTS.md or CLAUDE.md
-- [ ] Project has .qoder/context.md (optional but recommended)
-- [ ] WSL optimizations enabled (if on WSL)
-- [ ] Compliance arch read (if touching src/compliance/)
+- [ ] CANON loaded (`~/developer/canon/modules/CORE.md`)
+- [ ] Project has AGENTS.md and CLAUDE.md
+- [ ] LiteLLM :4000 responding (for Aider CLI)
+- [ ] Ruflo config present (`ruflo/config.yaml`)
+- [ ] Compliance arch read (if touching `src/compliance/`)
 
 After completing work:
 
 - [ ] Changes committed to canonical repository
 - [ ] Tests pass
+- [ ] parallel-verify.sh run (for compliance/security changes)
 - [ ] Documentation updated (if needed)
 - [ ] No secrets committed
 - [ ] Clear commit messages
+- [ ] MEMORY.md updated
 
 ---
 
@@ -400,13 +296,18 @@ After completing work:
 |---------|------|--------|
 | 1.0 | 2026-03-XX | Two-terminal workflow (deprecated) |
 | 2.0 | 2026-04-02 | Manual coordination pattern |
-| 3.0 | 2026-04-03 | Single-terminal automatic synergy (current) |
+| 3.0 | 2026-04-03 | Single-terminal Claude Code + Qoder CLI synergy |
+| 4.0 | 2026-04-06 | Four-Partner Swarm v2.0, Qoder removed, CANON layer added |
 
 ---
 
 ## Related Documents
 
-- `AGENTS.md` — Executable agent instructions
-- `.qoder/context.md` — Qoder execution contract
-- `docs/MCP-BEST-PRACTICES.md` — MCP server configuration guide
-- `src/compliance/COMPLIANCE_ARCH.md` — Compliance invariants (if applicable)
+- `docs/subagent-patterns.md` — named subagent patterns (RIV / MFR / CA / PDG / MED)
+- `ruflo/config.yaml` — Ruflo orchestrator configuration
+- `ruflo/start-ruflo.sh` — stack health check + startup
+- `scripts/aider-banxe.sh` — Aider via LiteLLM (4 modes)
+- `scripts/parallel-verify.sh` — 3-model consensus verification
+- `AGENTS.md` — agent execution instructions
+- `canon/modules/CORE.md` — universal canon rules
+- `src/compliance/COMPLIANCE_ARCH.md` — compliance invariants (if applicable)

@@ -1,8 +1,17 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "2cfda290abb1f34a89a52ffcc52edeeb6be8ae6f",
-  "source_message": "sync: CANON update — KA-01..KA-10, preflight hook, developer-core@aca6d51",
-  "extracted_at": "2026-04-06T00:02:16Z",
+  "source_commit": "992b4a1055346f757475425fccd819c6ac355c9f",
+  "source_message": "sync: Update shared stack from developer-core (Sprint 9 — BANXE AI Stack v2.0)
+
+Four-Partner Swarm: Claude Code + Ruflo + Aider CLI + MiroFish
+- AGENTS.md v4.0 (Orchestration Protocol v4.0)
+- docs/COLLAB.md v4.0 (Qoder removed, CANON layer)
+- docs/subagent-patterns.md (RIV/MFR/CA/PDG/MED)
+- ruflo/config.yaml + start-ruflo.sh
+- scripts/aider-banxe.sh + parallel-verify.sh
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-06T01:04:46Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
