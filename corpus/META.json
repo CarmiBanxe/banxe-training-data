@@ -1,15 +1,10 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "6ecff31c013ff03ee36fd823db12017698d6d83a",
-  "source_message": "feat(G-02): auto-trigger ExplanationBundle for transactions ≥ £10,000 (FCA SS1/23 / I-25)
-
-- Import ExplanationBundle in api.py
-- transaction_check: if req.amount >= 10_000, call from_banxe_result() and embed
-  explanation in response
-- 74 tests pass (17 G-03 + 39 phase15 + 18 suite)
+  "source_commit": "2e53ef88ce1533b995bcebf44900de044bb2d677",
+  "source_message": "scripts: fix deploy script — non-fatal service restart + health check
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T07:58:40Z",
+  "extracted_at": "2026-04-06T07:59:41Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
