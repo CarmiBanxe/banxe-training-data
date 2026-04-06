@@ -1,6 +1,6 @@
 # MEMORY.md — Banxe AI Bank
 
-> Последнее обновление: 2026-04-06. Sprint 8 sync: MEMORY.md updated, CANON deployed, 22/22 GAPs DONE.
+> Последнее обновление: 2026-04-06. Sprint 9 DONE: BANXE AI Stack v2.0 (Four-Partner Swarm), MiroFish deployed, Qoder removed.
 
 ## Инфраструктура
 
@@ -26,9 +26,12 @@
 | Deep Search | 8088 | active |
 | n8n | 5678 | active |
 | nginx | 443/80 | active |
+| LiteLLM proxy | 4000 | active (OpenAI-compat router → Ollama) |
 | Jube TM | 5001 | active |
 | Marble API | 5002 | active |
 | Marble UI | 5003 | active |
+| MiroFish UI | 3001 | active (3000 reserved by workflow-service) |
+| MiroFish API | 5004 | active (5001 reserved by jube.webapi) |
 
 ## Ollama модели (актуально 2026-04-03)
 
@@ -239,6 +242,47 @@ ClickHouse:9000 → FCA audit trail         always
   → экспортирует `banxe.audit_trail` → `docs/training-exports/decisions-YYYY-MM.jsonl`
   → workflow подберёт при следующем push
 # workflow verified 2026-04-04T21:11:15Z
+
+## BANXE AI Stack v2.0 (Sprint 9, 2026-04-06)
+
+### Архитектура (Four-Partner Swarm)
+
+| # | Партнёр | Роль | Точка входа |
+|---|---------|------|-------------|
+| 1 | **Claude Code** | Архитектор, ревьюер, оркестратор | `claude` |
+| 2 | **Ruflo** | Оркестратор multi-step потоков | `ruflo/start-ruflo.sh` |
+| 3 | **Aider CLI** | Единственный code executor | `scripts/aider-banxe.sh` |
+| 4 | **MiroFish** | Симулятор поведения/регуляции | `:3001` (UI) / `:5004/health` (API) |
+
+- **LiteLLM :4000** — model routing infrastructure (не партнёр). Маршруты: qwen3-30b, qwen3-banxe, glm-4-flash, gpt-oss-20b
+- **Qoder CLI** — УДАЛЁН полностью. Aider CLI — замена. `.qoder/` директория удалена из всех репо.
+
+### Ключевые артефакты (developer-core → все репо)
+
+| Файл | Назначение |
+|---|---|
+| `ruflo/config.yaml` | Ruflo: модели, партнёры, OpenClaw боты, Telegram alerts |
+| `ruflo/start-ruflo.sh` | Stack health check (LiteLLM + Ollama + OpenClaw + MiroFish + Aider) |
+| `scripts/aider-banxe.sh` | Aider via LiteLLM: `--fast` / `--full` / `--banxe` / `--unrestricted` |
+| `scripts/parallel-verify.sh` | 3-модельная верификация: 2/3 consensus → PASS |
+| `scripts/start_banxe_stack.sh` | Master startup check всего стека |
+| `docs/COLLAB.md` v4.0 | Collaboration contract: Four-Partner Swarm, CANON layer, safe exec rules |
+| `docs/subagent-patterns.md` | Named patterns: RIV / MFR / CA / PDG / MED |
+
+### MiroFish (задеплоен на GMKtec 2026-04-06)
+
+- Docker compose: `/root/developer/mirofish/docker-compose.yml`
+- Image: `ghcr.io/666ghj/mirofish:latest`
+- Порты: `3001:3000` (UI) / `5004:5001` (API)
+- Health: `curl http://localhost:5004/health` → `{"service":"MiroFish Backend","status":"ok"}`
+- Рестарт: `ssh gmktec 'cd /root/developer/mirofish && docker compose up -d'`
+
+### CANON System (Sprint 7–8, ~/developer/canon/)
+
+- `CORE.md` — 13 секций: preflight, epistemic accuracy, anti-hallucination, KA-01..KA-10
+- `DEV.md`, `DECISION.md`, `FR_MODULE.md` (French legal, v3.1-banxe)
+- Иерархия: **CANON → CLAUDE.md → AGENTS.md → COLLAB.md**
+- Preflight: `bash scripts/canon_preflight.sh`
 
 ## Architecture Repository (2026-04-05)
 
