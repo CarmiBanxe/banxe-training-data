@@ -291,6 +291,48 @@ ClickHouse:9000 → FCA audit trail         always
 - Иерархия: **CANON → CLAUDE.md → AGENTS.md → COLLAB.md**
 - Preflight: `bash scripts/canon_preflight.sh`
 
+## banxe-emi-stack — Financial Analytics P0 (2026-04-06)
+
+- **Репо:** `CarmiBanxe/banxe-emi-stack` (private) → https://github.com/CarmiBanxe/banxe-emi-stack
+- **Локально:** `/home/mmber/banxe-emi-stack/` — ОТДЕЛЬНЫЙ терминал, не смешивать с vibe-coding
+- **Назначение:** FCA CASS 15 / PS25/12 P0 — deadline 7 May 2026
+- **IL:** IL-009 VERIFY (banxe-architecture commit 70d48ea)
+- **Commit:** ab81ecc — 24 файла, 1385 строк
+
+### P0 компоненты (committed ab81ecc)
+
+| Компонент | Путь | Статус |
+|-----------|------|--------|
+| Midaz async client | `services/ledger/midaz_client.py` | ✅ |
+| ReconciliationEngine | `services/recon/reconciliation_engine.py` | ✅ (mirror vibe-coding 3f7060f) |
+| StatementFetcher (CSV) | `services/recon/statement_fetcher.py` | ✅ |
+| CAMT.053 parser wrapper | `services/recon/bankstatement_parser.py` | ✅ (Phase 2 адаптер) |
+| FIN060 PDF generator | `services/reporting/fin060_generator.py` | ✅ (WeasyPrint) |
+| dbt staging model | `dbt/models/staging/stg_ledger_transactions.sql` | ✅ |
+| dbt safeguarding mart | `dbt/models/marts/safeguarding/safeguarding_daily.sql` | ✅ |
+| dbt FIN060 mart | `dbt/models/marts/fin060/fin060_monthly.sql` | ✅ |
+| Docker recon stack | `docker/docker-compose.recon.yml` | ✅ |
+| Docker reporting stack | `docker/docker-compose.reporting.yml` | ✅ |
+| Daily recon cron | `scripts/daily-recon.sh` (07:00 UTC Mon-Fri) | ✅ |
+| Monthly FCA return | `scripts/monthly-fca-return.sh` | ✅ |
+| Audit export | `scripts/audit-export.sh` | ✅ |
+| ReconcAgent spec | `.claude/agents/reconciliation-agent.md` | ✅ |
+| ReportingAgent spec | `.claude/agents/reporting-agent.md` | ✅ |
+
+### Midaz account IDs (ADR-013)
+```
+ORG_ID:              019d6301-32d7-70a1-bc77-0a05379ee510
+LEDGER_ID:           019d632f-519e-7865-8a30-3c33991bba9c
+client_funds:        019d6332-da7f-752f-b9fd-fa1c6fc777ec
+operational:         019d6332-f274-709a-b3a7-983bc8745886
+RECON_THRESHOLD_GBP: 1.00
+```
+
+### P1 pending (не в skeleton)
+- n8n workflow JSON (live n8n instance required)
+- pgAudit init SQL (`docker/postgres/pgaudit.sql`)
+- adorsys PSD2 gateway (CAMT.053 auto-pull, Phase 2)
+
 ## Architecture Repository (2026-04-05)
 
 - Репо: `CarmiBanxe/banxe-architecture` (приватный, **ОПУБЛИКОВАН 2026-04-05** → https://github.com/CarmiBanxe/banxe-architecture)
