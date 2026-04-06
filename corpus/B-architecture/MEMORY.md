@@ -1,6 +1,6 @@
 # MEMORY.md — Banxe AI Bank
 
-> Последнее обновление: 2026-04-06. Sprint 9 DONE: BANXE AI Stack v2.0 (Four-Partner Swarm), MiroFish deployed, Qoder removed.
+> Последнее обновление: 2026-04-06. Sprint 10 in progress: G-03 Emergency Stop (17/17 tests ✅), G-02 ExplanationBundle £10k auto-trigger ✅, G-16 Hexagonal Ports (COMPLETE, 30 tests). Code deployed to GMKtec.
 
 ## Инфраструктура
 
@@ -128,6 +128,10 @@
 - DONE (2026-04-06): GAP 6 autoresearch — docs/GAP-6-AUTORESEARCH.md (config fix: LiteLLM :4000, qwen3-30b)
 - DONE (2026-04-06): HITL Dashboard spec — docs/HITL-DASHBOARD-SPEC.md (MVP: hitl_queue CH + FastAPI + Telegram)
 - DONE (2026-04-06): CarmiBanxe/collaboration — заархивирован на GitHub
+- DONE (2026-04-06 Sprint 10): G-03 Emergency Stop — test_emergency_stop.py 17/17 тестов (T-01..T-17): fail-open, dual-write, lifecycle, I-23, I-24 ✅
+- DONE (2026-04-06 Sprint 10): G-16 Hexagonal Ports — 4 порта (EmergencyPort/PolicyPort/DecisionPort/AuditPort) + 30 тестов — COMPLETE (инвентаризация)
+- DONE (2026-04-06 Sprint 10): G-02 ExplanationBundle auto-trigger — api.py transaction_check: if amount_gbp >= 10_000 → ExplanationBundle.from_banxe_result() (I-25, FCA SS1/23)
+- DONE (2026-04-06 Sprint 10): scripts/deploy-sprint10-g02-g03.sh — деплой G-02+G-03 на GMKtec (git pull ✅)
 - ✅ think:false ПРОВЕРЕНО (2026-04-05): OpenClaw передаёт только num_ctx+streaming в params.
   Thinking подавлено через пустой <think></think> в Modelfile + thinkingDefault:"off" в openclaw.json.
   Действие не требуется — механизм работает корректно.
