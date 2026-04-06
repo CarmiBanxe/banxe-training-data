@@ -144,7 +144,7 @@
 
 | Файл | Назначение |
 |------|-----------|
-| api.py | FastAPI :8090 — 9 endpoints |
+| api.py | FastAPI :8093 — 15 endpoints |
 | audit_trail.py | ClickHouse logging, TTL 5 лет |
 | crypto_aml.py | FINOS OpenAML + Watchman OFAC |
 | dashboard.py | CEO Dashboard, ClickHouse analytics |
