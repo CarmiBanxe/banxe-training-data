@@ -1,13 +1,20 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "c88a04aed77778c1682cb4868bf9459b7b626580",
-  "source_message": "docs: add banxe-emi-stack P0 section to MEMORY.md (IL-009 VERIFY)
+  "source_commit": "081a2a07382dcf7b49b8cce114ed79cf92e148ba",
+  "source_message": "feat(il-016): QualityGuard Agent + quality-gate.sh + Semgrep +2 rules
 
-Documents GitHub repo, 24 P0 skeleton files, Midaz account IDs,
-component table, and P1 pending items.
+Part A — QualityGuard Agent:
+- scripts/quality-gate.sh: unified quality gate (semgrep+ruff+pytest+
+  coverage+invariants I-05/I-06), auto-detects vibe-coding vs emi-stack
+- .claude/agents/qualityguard-agent.md: QualityGuard Agent definition
+- .claude/hooks/quality_gate_hook.py: PreToolUse hook, blocks git commit
+  when quality gate fails
+- .claude/settings.json: +quality_gate_hook in PreToolUse[Bash]
+- .semgrep/banxe-rules.yml: +2 rules (banxe-audit-delete I-24,
+  banxe-clickhouse-ttl-reduce I-08) → 10 rules total
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-06T19:35:54Z",
+  "extracted_at": "2026-04-07T14:14:14Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
