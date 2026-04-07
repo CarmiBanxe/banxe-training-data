@@ -1,20 +1,14 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "081a2a07382dcf7b49b8cce114ed79cf92e148ba",
-  "source_message": "feat(il-016): QualityGuard Agent + quality-gate.sh + Semgrep +2 rules
+  "source_commit": "92665e4eb62d8b3980f548d54175af4c246aa7b7",
+  "source_message": "fix(il-016): quality_gate_hook — enforce gate only for Product Plane
 
-Part A — QualityGuard Agent:
-- scripts/quality-gate.sh: unified quality gate (semgrep+ruff+pytest+
-  coverage+invariants I-05/I-06), auto-detects vibe-coding vs emi-stack
-- .claude/agents/qualityguard-agent.md: QualityGuard Agent definition
-- .claude/hooks/quality_gate_hook.py: PreToolUse hook, blocks git commit
-  when quality gate fails
-- .claude/settings.json: +quality_gate_hook in PreToolUse[Bash]
-- .semgrep/banxe-rules.yml: +2 rules (banxe-audit-delete I-24,
-  banxe-clickhouse-ttl-reduce I-08) → 10 rules total
+Developer Plane (vibe-coding) has pre-existing tracked issues.
+Blocking its infra commits creates a chicken-and-egg loop.
+Gate now enforces only for PRODUCT_PLANE_REPOS = {banxe-emi-stack}.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-07T14:14:14Z",
+  "extracted_at": "2026-04-07T14:16:55Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
