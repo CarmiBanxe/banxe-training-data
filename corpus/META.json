@@ -1,14 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "92665e4eb62d8b3980f548d54175af4c246aa7b7",
-  "source_message": "fix(il-016): quality_gate_hook — enforce gate only for Product Plane
-
-Developer Plane (vibe-coding) has pre-existing tracked issues.
-Blocking its infra commits creates a chicken-and-egg loop.
-Gate now enforces only for PRODUCT_PLANE_REPOS = {banxe-emi-stack}.
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-07T14:16:55Z",
+  "source_commit": "9f8e663497ab0e237c662067c08599ac2c830370",
+  "source_message": "fix(train-agent): move TIMESTAMP def before corpus loop (NameError)",
+  "extracted_at": "2026-04-07T17:09:16Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
