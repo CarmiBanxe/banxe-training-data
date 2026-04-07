@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "9f8e663497ab0e237c662067c08599ac2c830370",
-  "source_message": "fix(train-agent): move TIMESTAMP def before corpus loop (NameError)",
-  "extracted_at": "2026-04-07T17:09:16Z",
+  "source_commit": "ec8b72bed040807eb0ff7204cec49ce6c7d1cf4d",
+  "source_message": "fix(train-agent): handle ConsensusResult dataclass in live verifier path",
+  "extracted_at": "2026-04-07T22:16:50Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
