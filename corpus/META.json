@@ -1,8 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "ec8b72bed040807eb0ff7204cec49ce6c7d1cf4d",
-  "source_message": "fix(train-agent): handle ConsensusResult dataclass in live verifier path",
-  "extracted_at": "2026-04-07T22:16:50Z",
+  "source_commit": "233b80e7776f96c24afc668ea2b65f68945942bc",
+  "source_message": "sync: Update shared stack from developer-core
+
+Components updated:
+- AGENTS.md (three-partner synergy)
+- .qoder/context.md (UNIVERSAL — Claude + Qoder + MiroFish)
+- docs/COLLAB.md
+- docs/MCP-BEST-PRACTICES.md
+- .qoder/config.yml
+- scripts/check-agent-instructions.sh
+- docs/MIROFISH-SCENARIOS.md (project-specific)
+
+Source: ~/developer/ (MASTER)
+Synced via: sync-all.sh
+
+🤖 Generated with [Qoder][https://qoder.com]",
+  "extracted_at": "2026-04-07T22:17:13Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
