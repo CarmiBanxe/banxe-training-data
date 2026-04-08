@@ -1,13 +1,22 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "8cc5d48f9ad3583fb5d35ddd012e9b83ea2b4b6c",
-  "source_message": "docs(memory): record Keycloak BT-011 UNBLOCKED — GMKtec :8180 deployed
+  "source_commit": "188590e925d674c19adabec85a7f6afedf8f23b2",
+  "source_message": "sync: Update shared stack from developer-core
 
-Keycloak 26.2.5 live, realm banxe, 7 roles, IL-039 DONE.
-Legion reaches gmktec:8180 directly (verified).
+Components updated:
+- AGENTS.md (three-partner synergy)
+- .qoder/context.md (UNIVERSAL — Claude + Qoder + MiroFish)
+- docs/COLLAB.md
+- docs/MCP-BEST-PRACTICES.md
+- .qoder/config.yml
+- scripts/check-agent-instructions.sh
+- docs/MIROFISH-SCENARIOS.md (project-specific)
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-08T01:04:15Z",
+Source: ~/developer/ (MASTER)
+Synced via: sync-all.sh
+
+🤖 Generated with [Qoder][https://qoder.com]",
+  "extracted_at": "2026-04-08T23:42:19Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
