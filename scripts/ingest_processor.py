@@ -17,7 +17,6 @@ ingest_processor.py — Обработка файлов из raw/ и созда�
 - knowledge-base/index.json ← полный индекс всех материалов
 """
 
-import os
 import json
 import hashlib
 import shutil
@@ -77,7 +76,7 @@ class IngestProcessor:
             doc.close()
             return text
         except ImportError:
-            print(f"⚠️  pymupdf не установлен, копируем PDF как есть")
+            print("⚠️  pymupdf не установлен, копируем PDF как есть")
             return None
         except Exception as e:
             print(f"⚠️  Ошибка при извлечении PDF {file_path}: {e}")
@@ -91,7 +90,7 @@ class IngestProcessor:
             text = "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
             return text
         except ImportError:
-            print(f"⚠️  python-docx не установлен, копируем DOCX как есть")
+            print("⚠️  python-docx не установлен, копируем DOCX как есть")
             return None
         except Exception as e:
             print(f"⚠️  Ошибка при извлечении DOCX {file_path}: {e}")
@@ -209,7 +208,7 @@ class IngestProcessor:
     
     def run(self) -> Dict[str, Any]:
         """Запускает полный процесс ingest"""
-        print(f"🚀 Запуск ingest processor...")
+        print("🚀 Запуск ingest processor...")
         print(f"   Base dir: {self.base_dir}")
         print(f"   Raw dir: {self.raw_dir}")
         print(f"   Processed dir: {self.processed_dir}")
@@ -250,7 +249,7 @@ class IngestProcessor:
         # Сохраняем индекс
         self.save_index()
         
-        print(f"\n✅ Ingest завершён!")
+        print("\n✅ Ingest завершён!")
         print(f"   Всего файлов: {self.index['total_files']}")
         print(f"   Индекс: {self.kb_dir / 'index.json'}")
         
@@ -266,10 +265,10 @@ class IngestProcessor:
         # Создаём README для knowledge-base
         readme_path = self.kb_dir / 'README.md'
         with open(readme_path, 'w', encoding='utf-8') as f:
-            f.write(f"# Knowledge Base\n\n")
+            f.write("# Knowledge Base\n\n")
             f.write(f"**Updated:** {self.index['updated_at']}\n")
             f.write(f"**Total files:** {self.index['total_files']}\n\n")
-            f.write(f"## Categories\n\n")
+            f.write("## Categories\n\n")
             for cat, items in self.index['categories'].items():
                 f.write(f"### {cat.title()}\n")
                 f.write(f"Files: {len(items)}\n\n")
@@ -293,6 +292,6 @@ if __name__ == '__main__':
     # Выводим summary для GitHub Actions
     print("\n--- GitHub Actions Summary ---")
     print(f"Processed: {result['processed']} files")
-    print(f"Categories:")
+    print("Categories:")
     for cat, items in result['index']['categories'].items():
         print(f"  {cat}: {len(items)} files")

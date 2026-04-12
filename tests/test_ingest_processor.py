@@ -4,7 +4,6 @@ Validates: schema correctness, data quality, file handling, GDPR compliance
 """
 import json
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
