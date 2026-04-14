@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-04-14T18:36:46.206491",
+  "total_files": 4,
+  "categories": {
+    "docs": [
+      {
+        "id": "e3b0c44298fc",
+        "filename": ".gitkeep",
+        "path": "docs/.gitkeep",
+        "status": "unknown_format"
+      }
+    ],
+    "data": [
+      {
+        "id": "e3b0c44298fc",
+        "filename": ".gitkeep",
+        "path": "data/.gitkeep",
+        "status": "unknown_format"
+      }
+    ],
+    "media": [
+      {
+        "id": "e3b0c44298fc",
+        "filename": ".gitkeep",
+        "path": "media/.gitkeep",
+        "status": "unknown_format"
+      }
+    ],
+    "links": [
+      {
+        "id": "e3b0c44298fc",
+        "filename": ".gitkeep",
+        "path": "links/.gitkeep",
+        "status": "unknown_format"
+      }
+    ]
+  },
+  "files": [
+    {
+      "id": "e3b0c44298fc",
+      "original_path": "docs/.gitkeep",
+      "filename": ".gitkeep",
+      "extension": "",
+      "category": "docs",
+      "size_bytes": 0,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "processed_at": "2026-04-14T18:36:46.204969",
+      "status": "unknown_format",
+      "extracted_text": null,
+      "output_path": "processed/docs/.gitkeep"
+    },
+    {
+      "id": "e3b0c44298fc",
+      "original_path": "data/.gitkeep",
+      "filename": ".gitkeep",
+      "extension": "",
+      "category": "data",
+      "size_bytes": 0,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "processed_at": "2026-04-14T18:36:46.205447",
+      "status": "unknown_format",
+      "extracted_text": null,
+      "output_path": "processed/data/.gitkeep"
+    },
+    {
+      "id": "e3b0c44298fc",
+      "original_path": "media/.gitkeep",
+      "filename": ".gitkeep",
+      "extension": "",
+      "category": "media",
+      "size_bytes": 0,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "processed_at": "2026-04-14T18:36:46.205841",
+      "status": "unknown_format",
+      "extracted_text": null,
+      "output_path": "processed/media/.gitkeep"
+    },
+    {
+      "id": "e3b0c44298fc",
+      "original_path": "links/.gitkeep",
+      "filename": ".gitkeep",
+      "extension": "",
+      "category": "links",
+      "size_bytes": 0,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "processed_at": "2026-04-14T18:36:46.206209",
+      "status": "unknown_format",
+      "extracted_text": null,
+      "output_path": "processed/links/.gitkeep"
+    }
+  ]
+}
