@@ -1,0 +1,499 @@
+[
+  {
+    "id": "id-api-gateway",
+    "type": "ApplicationComponent",
+    "name": "API Gateway",
+    "documentation": "FastAPI REST API layer (IL-046). 78 endpoints across 21 routers.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "api",
+      "banxe-module": "api/main.py",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-safeguarding-service",
+    "type": "ApplicationComponent",
+    "name": "Safeguarding Service",
+    "documentation": "CASS 15 safeguarding: daily reconciliation, breach detection, FIN060 return. Sprint 12.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "safeguarding",
+      "banxe-module": "src/safeguarding/",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-recon-engine",
+    "type": "ApplicationComponent",
+    "name": "Tri-Party Reconciliation Engine",
+    "documentation": "CASS 7.15.17R daily tri-party recon: rails vs Midaz GL vs safeguarding bank. GAP-010.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "settlement",
+      "banxe-module": "src/settlement/reconciler_engine.py",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-kyc-service",
+    "type": "ApplicationComponent",
+    "name": "KYC Service",
+    "documentation": "KYC workflow lifecycle: create → documents → EDD → approve/reject. Ballerine adapter.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "kyc",
+      "banxe-module": "services/kyc/",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-payment-service",
+    "type": "ApplicationComponent",
+    "name": "Payment Service",
+    "documentation": "FPS + SEPA CT + SEPA Instant via Modulr sandbox. Webhook signature verification.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "payment",
+      "banxe-module": "services/payment/",
+      "banxe-status": "ACTIVE+STUB"
+    }
+  },
+  {
+    "id": "id-aml-service",
+    "type": "ApplicationComponent",
+    "name": "AML / Fraud Service",
+    "documentation": "FraudAML pipeline with Jube (self-hosted ML). PSR APP 2024 compliant.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "fraud",
+      "banxe-module": "services/fraud/",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-iam-service",
+    "type": "ApplicationComponent",
+    "name": "IAM Service",
+    "documentation": "Keycloak OIDC + RBAC. MockIAMAdapter for tests. KeycloakAdapter for production.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "iam",
+      "banxe-module": "services/iam/",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-ledger-service",
+    "type": "ApplicationComponent",
+    "name": "Ledger Service",
+    "documentation": "Midaz CBS adapter. get_balance(), create_transaction(), list_transactions(). S13-01.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-domain": "ledger",
+      "banxe-module": "services/ledger/",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-openclaw-moa-bot",
+    "type": "ApplicationComponent",
+    "name": "OpenClaw moa-bot",
+    "documentation": "Telegram/HTTP bot @mycarmi_moa_bot. MLRO operator assistant. GMKtec :18789.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:18789",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "Commercial"
+    }
+  },
+  {
+    "id": "id-openclaw-ctio-bot",
+    "type": "ApplicationComponent",
+    "name": "OpenClaw ctio-bot",
+    "documentation": "Telegram/HTTP bot for CTIO (Oleg). GMKtec :18791.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:18791",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "Commercial"
+    }
+  },
+  {
+    "id": "id-banxe-screener",
+    "type": "ApplicationComponent",
+    "name": "Banxe Screener",
+    "documentation": "Moov Watchman + PEP wrapper. OFAC/UN/EU/UK sanctions + PEP screening. GMKtec :8085.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8085",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-yente",
+    "type": "ApplicationComponent",
+    "name": "Yente / OpenSanctions",
+    "documentation": "OpenSanctions primary sanctions/PEP database (200K+ entities). MIT licence. GMKtec :8086. Phase 3 target.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8086",
+      "banxe-status": "PLANNED",
+      "banxe-license": "MIT"
+    }
+  },
+  {
+    "id": "id-pii-proxy",
+    "type": "ApplicationComponent",
+    "name": "PII Proxy / Presidio",
+    "documentation": "Microsoft Presidio GDPR PII anonymisation proxy. MIT licence. GMKtec :8089.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8089",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "MIT"
+    }
+  },
+  {
+    "id": "id-deep-search",
+    "type": "ApplicationComponent",
+    "name": "Deep Search",
+    "documentation": "Compliance research service. GMKtec :8088.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8088",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-auto-verify-api",
+    "type": "ApplicationComponent",
+    "name": "Auto-Verify API",
+    "documentation": "Agent response verification API. GMKtec :8094.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8094",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-hyperswitch-app",
+    "type": "ApplicationComponent",
+    "name": "Hyperswitch App Server",
+    "documentation": "Payment orchestration and switch. Apache 2.0. Sprint 9 (P0: env fix). GMKtec :8096.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8096",
+      "banxe-status": "ACTIVE+P0",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-hyperswitch-control",
+    "type": "ApplicationComponent",
+    "name": "Hyperswitch Control Center",
+    "documentation": "Payment operations dashboard. Apache 2.0. Sprint 9. GMKtec :8097.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8097",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-hyperswitch-vault",
+    "type": "ApplicationComponent",
+    "name": "Hyperswitch Card Vault",
+    "documentation": "PCI-compliant card tokenisation storage. Apache 2.0. Sprint 9 (P0: env fix). GMKtec :8098.",
+    "banxe_domain": "services",
+    "properties": {
+      "banxe-host": "localhost:8098",
+      "banxe-status": "ACTIVE+P0",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-onboarding-process",
+    "type": "BusinessProcess",
+    "name": "Customer Onboarding",
+    "documentation": "EMR 2011 Reg.4 — customer creation + KYC + agreement lifecycle.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "customers"
+    }
+  },
+  {
+    "id": "id-daily-recon-process",
+    "type": "BusinessProcess",
+    "name": "Daily Reconciliation",
+    "documentation": "CASS 7.15.17R — daily internal (Midaz) vs external (CAMT.053) reconciliation. Cron at 23:50 UTC.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "safeguarding"
+    }
+  },
+  {
+    "id": "id-sar-process",
+    "type": "BusinessProcess",
+    "name": "SAR Filing",
+    "documentation": "POCA 2002 s.330 — Suspicious Activity Report lifecycle: file → MLRO approve → submit NCA.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "compliance"
+    }
+  },
+  {
+    "id": "id-tx-monitoring-process",
+    "type": "BusinessProcess",
+    "name": "Transaction Monitoring",
+    "documentation": "Real-time transaction screening via Jube probabilistic ML engine. PSR APP 2024 / MLR 2017.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "fraud"
+    }
+  },
+  {
+    "id": "id-sanctions-screening-process",
+    "type": "BusinessProcess",
+    "name": "Sanctions Screening",
+    "documentation": "OFAC/UN/EU/UK sanctions and PEP check. Triggered at onboarding and on each payment. MLR 2017 Reg.28.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "compliance"
+    }
+  },
+  {
+    "id": "id-payment-processing-process",
+    "type": "BusinessProcess",
+    "name": "Payment Processing",
+    "documentation": "FPS/SEPA payment lifecycle: initiate → screen → authorise → settle → notify. PSR 2017.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "payment"
+    }
+  },
+  {
+    "id": "id-consumer-duty-process",
+    "type": "BusinessProcess",
+    "name": "Consumer Duty DISP",
+    "documentation": "FCA DISP complaints handling under Consumer Duty (PS22/9). 3-day acknowledgement + 8-week resolution SLA.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "compliance"
+    }
+  },
+  {
+    "id": "id-fin060-process",
+    "type": "BusinessProcess",
+    "name": "FIN060 Return",
+    "documentation": "FCA regulatory return FIN060 — safeguarding funds report. Annual submission via RegData.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "banxe-domain": "safeguarding"
+    }
+  },
+  {
+    "id": "id-midaz",
+    "type": "TechnologyService",
+    "name": "Midaz CBS",
+    "documentation": "Core Banking System. Self-hosted on GMKtec :8095. Double-entry GL ledger. Apache 2.0. Sprint 8.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:8095",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-keycloak",
+    "type": "TechnologyService",
+    "name": "Keycloak IAM",
+    "documentation": "Keycloak 26.2.5 OIDC. Realm: banxe. GMKtec :8180. 7 roles.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:8180"
+    }
+  },
+  {
+    "id": "id-clickhouse",
+    "type": "TechnologyService",
+    "name": "ClickHouse Audit DB",
+    "documentation": "Append-only audit trail. TTL 5 years (FCA MLR 2017 I-08). Tables: safeguarding_events, recon_events. :8123/9000.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:8123",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-marble",
+    "type": "TechnologyService",
+    "name": "Marble Case Management",
+    "documentation": "Self-hosted Apache 2.0 case management. MLRO inbox, case assignment. GMKtec :5002. I-19: internal only.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:5002",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-ollama",
+    "type": "TechnologyService",
+    "name": "Ollama",
+    "documentation": "LLM inference server. Primary model: qwen3-banxe-v2 (~30b-a3b). AMD ROCm. GMKtec :11434. MIT licence.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:11434",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "MIT"
+    }
+  },
+  {
+    "id": "id-jube-tm",
+    "type": "TechnologyService",
+    "name": "Jube TM",
+    "documentation": "Probabilistic transaction monitoring engine. Self-hosted. AGPLv3. GMKtec :5001.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:5001",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "AGPLv3"
+    }
+  },
+  {
+    "id": "id-postgres-compliance",
+    "type": "TechnologyService",
+    "name": "PostgreSQL (compliance)",
+    "documentation": "Compliance database. PEP records (14,491), KYB entities. PostgreSQL licence. GMKtec :5432.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:5432",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-postgres-jube",
+    "type": "TechnologyService",
+    "name": "PostgreSQL (Jube)",
+    "documentation": "Jube TM internal database. PostgreSQL licence. GMKtec :15432.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:15432",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-postgres-marble",
+    "type": "TechnologyService",
+    "name": "PostgreSQL (Marble)",
+    "documentation": "Marble case management database. PostgreSQL licence. GMKtec :15433.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:15433",
+      "banxe-status": "ACTIVE"
+    }
+  },
+  {
+    "id": "id-redis",
+    "type": "TechnologyService",
+    "name": "Redis",
+    "documentation": "Velocity monitoring cache. 24h TTL. BSD licence. GMKtec :6379.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:6379",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "BSD"
+    }
+  },
+  {
+    "id": "id-redis-jube",
+    "type": "TechnologyService",
+    "name": "Redis (Jube)",
+    "documentation": "Jube TM internal cache. BSD licence. GMKtec :16379.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:16379",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "BSD"
+    }
+  },
+  {
+    "id": "id-n8n",
+    "type": "TechnologyService",
+    "name": "n8n",
+    "documentation": "Workflow automation (developer tooling). Fair-code licence. GMKtec :5678.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:5678",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "Fair-code"
+    }
+  },
+  {
+    "id": "id-nginx",
+    "type": "TechnologyService",
+    "name": "nginx",
+    "documentation": "Reverse proxy and Web UI gateway. MIT licence. GMKtec :443/:80.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:443/80",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "MIT"
+    }
+  },
+  {
+    "id": "id-firebase-emulator",
+    "type": "TechnologyService",
+    "name": "Firebase Emulator",
+    "documentation": "Firebase auth emulator for Marble local mode. Apache 2.0. GMKtec :9099/:4000.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:9099",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "Apache 2.0"
+    }
+  },
+  {
+    "id": "id-mongodb-midaz",
+    "type": "TechnologyService",
+    "name": "MongoDB (Midaz)",
+    "documentation": "Midaz metadata store. rs0 replica set. SSPL licence. GMKtec :5703. Sprint 8.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:5703",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "SSPL"
+    }
+  },
+  {
+    "id": "id-rabbitmq-midaz",
+    "type": "TechnologyService",
+    "name": "RabbitMQ (Midaz)",
+    "documentation": "Midaz async transaction queue. MPL 2.0. GMKtec :3003 (HTTP mgmt) / :3004 (AMQP). Sprint 8.",
+    "banxe_domain": "infrastructure",
+    "properties": {
+      "banxe-host": "localhost:3003/3004",
+      "banxe-status": "ACTIVE",
+      "banxe-license": "MPL 2.0"
+    }
+  },
+  {
+    "id": "id-transaction-record",
+    "type": "DataObject",
+    "name": "TransactionRecord",
+    "documentation": "Immutable transaction record. amount_gbp: Decimal (I-05). status: APPROVED|PENDING|CANCELLED.",
+    "banxe_domain": "models",
+    "properties": {
+      "banxe-module": "services/ledger/midaz_adapter.py"
+    }
+  },
+  {
+    "id": "id-customer-profile",
+    "type": "DataObject",
+    "name": "CustomerProfile",
+    "documentation": "Customer entity with KYC status, risk tier, agreement refs. PII fields encrypted at rest.",
+    "banxe_domain": "models",
+    "properties": {
+      "banxe-module": "api/models/customers.py"
+    }
+  }
+]
