@@ -59,7 +59,7 @@ jobs:
             exit 0
           fi
           
-        git commit -m "auto: Process training data — files: ${{ steps.ingest.outputs.total_files }} (docs: ${{ steps.ingest.outputs.docs_count }}, data: ${{ steps.ingest.outputs.data_count }}, media: ${{ steps.ingest.outputs.media_count }})"
+          git commit -m "auto: Process training data — files: ${{ steps.ingest.outputs.total_files }} (docs: ${{ steps.ingest.outputs.docs_count }}, data: ${{ steps.ingest.outputs.data_count }}, media: ${{ steps.ingest.outputs.media_count }})"
           git push origin HEAD:main || git push origin HEAD:master
       
       - name: Send update event to developer-core
