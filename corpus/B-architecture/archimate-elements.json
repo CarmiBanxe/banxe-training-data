@@ -495,5 +495,135 @@
     "properties": {
       "banxe-module": "api/models/customers.py"
     }
+  },
+  {
+    "id": "id-card-issuance",
+    "type": "BusinessProcess",
+    "name": "Card Issuance",
+    "documentation": "Virtual/physical card creation via Hyperswitch Card Vault. PCI DSS scope.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "card-lifecycle"
+    }
+  },
+  {
+    "id": "id-card-activation",
+    "type": "BusinessProcess",
+    "name": "Card Activation",
+    "documentation": "Customer activates card via app or IVR. 3DS enrolment trigger.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "card-lifecycle"
+    }
+  },
+  {
+    "id": "id-card-blocking",
+    "type": "BusinessProcess",
+    "name": "Card Blocking",
+    "documentation": "Fraud or customer-initiated block. Real-time via Hyperswitch API.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "card-lifecycle"
+    }
+  },
+  {
+    "id": "id-card-replacement",
+    "type": "BusinessProcess",
+    "name": "Card Replacement",
+    "documentation": "Lost/stolen replacement flow. New PAN, migrate recurring mandates.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "card-lifecycle"
+    }
+  },
+  {
+    "id": "id-risk-assessment",
+    "type": "BusinessProcess",
+    "name": "Risk Assessment",
+    "documentation": "Customer risk scoring at onboarding. CDD/EDD tiering per MLR 2017 Reg.28.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "risk"
+    }
+  },
+  {
+    "id": "id-ops-risk-monitoring",
+    "type": "BusinessProcess",
+    "name": "Operational Risk Monitoring",
+    "documentation": "Daily monitoring of key risk indicators. Basel III pillar 2 aligned.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "risk"
+    }
+  },
+  {
+    "id": "id-fraud-detection",
+    "type": "BusinessProcess",
+    "name": "Fraud Detection",
+    "documentation": "Real-time fraud scoring via Jube ML engine. PSR APP 2024 compliant.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "risk"
+    }
+  },
+  {
+    "id": "id-okr-planning",
+    "type": "BusinessProcess",
+    "name": "OKR Planning",
+    "documentation": "Quarterly OKR cycle. CEO sets company OKRs, teams derive key results.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "strategy"
+    }
+  },
+  {
+    "id": "id-horizon-scanning",
+    "type": "BusinessProcess",
+    "name": "Regulatory Horizon Scanning",
+    "documentation": "FCA/PRA/EBA regulatory change monitoring. Impact assessment workflow.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "strategy"
+    }
+  },
+  {
+    "id": "id-roadmap-review",
+    "type": "BusinessProcess",
+    "name": "Product Roadmap Review",
+    "documentation": "Monthly product review. Feature prioritisation against compliance deadlines.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "strategy"
+    }
+  },
+  {
+    "id": "id-baas-onboarding",
+    "type": "BusinessProcess",
+    "name": "BaaS Tenant Onboarding",
+    "documentation": "White-label tenant setup. API keys, webhook config, sandbox provisioning.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "baas"
+    }
+  },
+  {
+    "id": "id-baas-sla",
+    "type": "BusinessProcess",
+    "name": "BaaS SLA Monitoring",
+    "documentation": "Tenant SLA tracking. Uptime, latency, error rate dashboards.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "baas"
+    }
+  },
+  {
+    "id": "id-baas-settlement",
+    "type": "BusinessProcess",
+    "name": "BaaS Settlement",
+    "documentation": "Daily tenant settlement. Fee calculation, revenue share, reconciliation.",
+    "banxe_domain": "workflows",
+    "properties": {
+      "propid-banxe-domain": "baas"
+    }
   }
 ]

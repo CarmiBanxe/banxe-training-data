@@ -257,5 +257,68 @@
     "source": "id-hyperswitch-app",
     "target": "id-hyperswitch-vault",
     "name": "card tokenisation"
+  },
+  {
+    "id": "id-rel-card-issuance-vault",
+    "type": "Composition",
+    "source": "id-card-issuance",
+    "target": "id-hyperswitch-vault",
+    "name": "composition"
+  },
+  {
+    "id": "id-rel-card-blocking-hs",
+    "type": "Composition",
+    "source": "id-card-blocking",
+    "target": "id-hyperswitch-app",
+    "name": "composition"
+  },
+  {
+    "id": "id-rel-card-activate-hs",
+    "type": "Composition",
+    "source": "id-card-activation",
+    "target": "id-hyperswitch-app",
+    "name": "composition"
+  },
+  {
+    "id": "id-rel-card-replace-vault",
+    "type": "Composition",
+    "source": "id-card-replacement",
+    "target": "id-hyperswitch-vault",
+    "name": "composition"
+  },
+  {
+    "id": "id-rel-fraud-jube",
+    "type": "Composition",
+    "source": "id-fraud-detection",
+    "target": "id-jube-tm",
+    "name": "composition"
+  },
+  {
+    "id": "id-rel-risk-kyc",
+    "type": "Flow",
+    "source": "id-risk-assessment",
+    "target": "id-kyc-service",
+    "name": "flow"
+  },
+  {
+    "id": "id-rel-ops-risk-ch",
+    "type": "Serving",
+    "source": "id-clickhouse",
+    "target": "id-ops-risk-monitoring",
+    "name": "serving"
+  },
+  {
+    "id": "id-rel-baas-settle-ledger",
+    "type": "Flow",
+    "source": "id-baas-settlement",
+    "target": "id-ledger-service",
+    "name": "flow"
+  },
+  {
+    "id": "id-rel-baas-onboard-iam",
+    "type": "Flow",
+    "source": "id-baas-onboarding",
+    "target": "id-iam-service",
+    "name": "flow"
   }
 ]
