@@ -1,0 +1,162 @@
+[
+  {
+    "id": "id-view-application-layer",
+    "type": "ModelViewpoint",
+    "name": "Application Layer — Banxe EMI Stack",
+    "nodes": [
+      {
+        "id": "node-api",
+        "elementRef": "id-api-gateway",
+        "type": "Element"
+      },
+      {
+        "id": "node-safeguarding",
+        "elementRef": "id-safeguarding-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-recon",
+        "elementRef": "id-recon-engine",
+        "type": "Element"
+      },
+      {
+        "id": "node-payment",
+        "elementRef": "id-payment-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-aml",
+        "elementRef": "id-aml-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-iam",
+        "elementRef": "id-iam-service",
+        "type": "Element"
+      }
+    ],
+    "node_count": 6
+  },
+  {
+    "id": "id-view-safeguarding",
+    "type": "ModelViewpoint",
+    "name": "CASS 15 Safeguarding Architecture",
+    "nodes": [
+      {
+        "id": "node-s1",
+        "elementRef": "id-safeguarding-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-s2",
+        "elementRef": "id-recon-engine",
+        "type": "Element"
+      },
+      {
+        "id": "node-s3",
+        "elementRef": "id-clickhouse",
+        "type": "Element"
+      },
+      {
+        "id": "node-s4",
+        "elementRef": "id-midaz",
+        "type": "Element"
+      }
+    ],
+    "node_count": 4
+  },
+  {
+    "id": "id-view-compliance-stack",
+    "type": "ModelViewpoint",
+    "name": "Compliance & AML Stack",
+    "nodes": [
+      {
+        "id": "node-c-aml",
+        "elementRef": "id-aml-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-c-jube",
+        "elementRef": "id-jube-tm",
+        "type": "Element"
+      },
+      {
+        "id": "node-c-screener",
+        "elementRef": "id-banxe-screener",
+        "type": "Element"
+      },
+      {
+        "id": "node-c-yente",
+        "elementRef": "id-yente",
+        "type": "Element"
+      },
+      {
+        "id": "node-c-marble",
+        "elementRef": "id-marble",
+        "type": "Element"
+      },
+      {
+        "id": "node-c-pg",
+        "elementRef": "id-postgres-compliance",
+        "type": "Element"
+      }
+    ],
+    "node_count": 6
+  },
+  {
+    "id": "id-view-payment-stack",
+    "type": "ModelViewpoint",
+    "name": "Payment Stack — Hyperswitch",
+    "nodes": [
+      {
+        "id": "node-p-svc",
+        "elementRef": "id-payment-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-p-app",
+        "elementRef": "id-hyperswitch-app",
+        "type": "Element"
+      },
+      {
+        "id": "node-p-ctrl",
+        "elementRef": "id-hyperswitch-control",
+        "type": "Element"
+      },
+      {
+        "id": "node-p-vault",
+        "elementRef": "id-hyperswitch-vault",
+        "type": "Element"
+      }
+    ],
+    "node_count": 4
+  },
+  {
+    "id": "id-view-ledger-stack",
+    "type": "ModelViewpoint",
+    "name": "Ledger Stack — Midaz CBS",
+    "nodes": [
+      {
+        "id": "node-l-svc",
+        "elementRef": "id-ledger-service",
+        "type": "Element"
+      },
+      {
+        "id": "node-l-midaz",
+        "elementRef": "id-midaz",
+        "type": "Element"
+      },
+      {
+        "id": "node-l-mongo",
+        "elementRef": "id-mongodb-midaz",
+        "type": "Element"
+      },
+      {
+        "id": "node-l-rmq",
+        "elementRef": "id-rabbitmq-midaz",
+        "type": "Element"
+      }
+    ],
+    "node_count": 4
+  }
+]

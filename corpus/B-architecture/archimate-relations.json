@@ -1,0 +1,261 @@
+[
+  {
+    "id": "id-rel-api-safeguarding",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-safeguarding-service",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-api-recon",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-recon-engine",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-api-payment",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-payment-service",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-api-kyc",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-kyc-service",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-api-aml",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-aml-service",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-ledger-midaz",
+    "type": "Serving",
+    "source": "id-ledger-service",
+    "target": "id-midaz",
+    "name": "calls"
+  },
+  {
+    "id": "id-rel-iam-keycloak",
+    "type": "Serving",
+    "source": "id-iam-service",
+    "target": "id-keycloak",
+    "name": "authenticates via"
+  },
+  {
+    "id": "id-rel-safeguarding-clickhouse",
+    "type": "Flow",
+    "source": "id-safeguarding-service",
+    "target": "id-clickhouse",
+    "name": "audit trail"
+  },
+  {
+    "id": "id-rel-recon-midaz",
+    "type": "Serving",
+    "source": "id-recon-engine",
+    "target": "id-midaz",
+    "name": "reads GL balance"
+  },
+  {
+    "id": "id-rel-aml-marble",
+    "type": "Flow",
+    "source": "id-aml-service",
+    "target": "id-marble",
+    "name": "creates case"
+  },
+  {
+    "id": "id-rel-onboarding-kyc",
+    "type": "Composition",
+    "source": "id-onboarding-process",
+    "target": "id-kyc-service",
+    "name": "triggers"
+  },
+  {
+    "id": "id-rel-recon-process-engine",
+    "type": "Composition",
+    "source": "id-daily-recon-process",
+    "target": "id-recon-engine",
+    "name": "executes via"
+  },
+  {
+    "id": "id-rel-aml-jube",
+    "type": "Serving",
+    "source": "id-aml-service",
+    "target": "id-jube-tm",
+    "name": "ML scoring"
+  },
+  {
+    "id": "id-rel-aml-yente",
+    "type": "Serving",
+    "source": "id-aml-service",
+    "target": "id-yente",
+    "name": "sanctions screening"
+  },
+  {
+    "id": "id-rel-safeguarding-midaz",
+    "type": "Serving",
+    "source": "id-safeguarding-service",
+    "target": "id-midaz",
+    "name": "reads GL"
+  },
+  {
+    "id": "id-rel-payment-hyperswitch",
+    "type": "Serving",
+    "source": "id-payment-service",
+    "target": "id-hyperswitch-app",
+    "name": "payment orchestration"
+  },
+  {
+    "id": "id-rel-kyc-postgres-compliance",
+    "type": "Access",
+    "source": "id-kyc-service",
+    "target": "id-postgres-compliance",
+    "name": "reads PEP data"
+  },
+  {
+    "id": "id-rel-api-iam",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-iam-service",
+    "name": "authenticates"
+  },
+  {
+    "id": "id-rel-api-ledger",
+    "type": "Serving",
+    "source": "id-api-gateway",
+    "target": "id-ledger-service",
+    "name": "serves"
+  },
+  {
+    "id": "id-rel-ledger-mongodb",
+    "type": "Access",
+    "source": "id-ledger-service",
+    "target": "id-mongodb-midaz",
+    "name": "metadata"
+  },
+  {
+    "id": "id-rel-ledger-rabbitmq",
+    "type": "Flow",
+    "source": "id-ledger-service",
+    "target": "id-rabbitmq-midaz",
+    "name": "async transactions"
+  },
+  {
+    "id": "id-rel-nginx-api",
+    "type": "Serving",
+    "source": "id-nginx",
+    "target": "id-api-gateway",
+    "name": "reverse proxy"
+  },
+  {
+    "id": "id-rel-pii-postgres-compliance",
+    "type": "Access",
+    "source": "id-pii-proxy",
+    "target": "id-postgres-compliance",
+    "name": "anonymisation"
+  },
+  {
+    "id": "id-rel-jube-postgres-jube",
+    "type": "Access",
+    "source": "id-jube-tm",
+    "target": "id-postgres-jube",
+    "name": "stores model data"
+  },
+  {
+    "id": "id-rel-jube-redis-jube",
+    "type": "Access",
+    "source": "id-jube-tm",
+    "target": "id-redis-jube",
+    "name": "internal cache"
+  },
+  {
+    "id": "id-rel-marble-postgres-marble",
+    "type": "Access",
+    "source": "id-marble",
+    "target": "id-postgres-marble",
+    "name": "stores cases"
+  },
+  {
+    "id": "id-rel-marble-firebase",
+    "type": "Serving",
+    "source": "id-marble",
+    "target": "id-firebase-emulator",
+    "name": "auth (local mode)"
+  },
+  {
+    "id": "id-rel-aml-redis",
+    "type": "Access",
+    "source": "id-aml-service",
+    "target": "id-redis",
+    "name": "velocity monitoring"
+  },
+  {
+    "id": "id-rel-tx-monitoring-aml",
+    "type": "Composition",
+    "source": "id-tx-monitoring-process",
+    "target": "id-aml-service",
+    "name": "executes via"
+  },
+  {
+    "id": "id-rel-sanctions-screener",
+    "type": "Composition",
+    "source": "id-sanctions-screening-process",
+    "target": "id-banxe-screener",
+    "name": "executes via"
+  },
+  {
+    "id": "id-rel-payment-proc-payment-svc",
+    "type": "Composition",
+    "source": "id-payment-processing-process",
+    "target": "id-payment-service",
+    "name": "executes via"
+  },
+  {
+    "id": "id-rel-fin060-safeguarding",
+    "type": "Composition",
+    "source": "id-fin060-process",
+    "target": "id-safeguarding-service",
+    "name": "executes via"
+  },
+  {
+    "id": "id-rel-openclaw-moa-ollama",
+    "type": "Serving",
+    "source": "id-openclaw-moa-bot",
+    "target": "id-ollama",
+    "name": "LLM inference"
+  },
+  {
+    "id": "id-rel-openclaw-ctio-ollama",
+    "type": "Serving",
+    "source": "id-openclaw-ctio-bot",
+    "target": "id-ollama",
+    "name": "LLM inference"
+  },
+  {
+    "id": "id-rel-midaz-mongodb",
+    "type": "Access",
+    "source": "id-midaz",
+    "target": "id-mongodb-midaz",
+    "name": "metadata store"
+  },
+  {
+    "id": "id-rel-midaz-rabbitmq",
+    "type": "Flow",
+    "source": "id-midaz",
+    "target": "id-rabbitmq-midaz",
+    "name": "async queue"
+  },
+  {
+    "id": "id-rel-hyperswitch-vault",
+    "type": "Serving",
+    "source": "id-hyperswitch-app",
+    "target": "id-hyperswitch-vault",
+    "name": "card tokenisation"
+  }
+]
