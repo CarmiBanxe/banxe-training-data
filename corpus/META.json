@@ -1,17 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "2c0529fdd5855f4d64593d57613d51ae5e9c36d2",
-  "source_message": "[FIX-VERIFY-3] vibe-coding: coverage 32%→80%, tx_monitor dict fix
-
-- tx_monitor.py: check_transaction() now accepts dict OR TransactionInput
-- test_api_integration.py: MagicMock→AsyncMock for check_transaction patches
-- test_coverage_comprehensive.py: 82 tests (dashboard, AML, SAR, decision_log)
-- test_coverage_verification.py: 45 tests (compliance_validator, policy, workflow agents)
-- test_coverage_validators.py: 50 tests (validate_contexts, agent_passport, trust_zones)
-- CI: --cov-fail-under=80 added to test-coverage.yml
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-17T23:23:24Z",
+  "source_commit": "d7db15d2b1caed32081f31bf01f24d776d5dd2e8",
+  "source_message": "chore(public-sanitize): remove remaining gitleaks findings from vibe-coding",
+  "extracted_at": "2026-04-17T23:26:34Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
