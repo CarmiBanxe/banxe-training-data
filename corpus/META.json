@@ -1,8 +1,8 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "d7db15d2b1caed32081f31bf01f24d776d5dd2e8",
-  "source_message": "chore(public-sanitize): remove remaining gitleaks findings from vibe-coding",
-  "extracted_at": "2026-04-17T23:26:34Z",
+  "source_commit": "861e01982ddf438e04b6034cdf2c9bbbedc19044",
+  "source_message": "chore(security): add gitleaks ignore for known false positives",
+  "extracted_at": "2026-04-17T23:29:27Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
