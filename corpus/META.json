@@ -1,8 +1,14 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "861e01982ddf438e04b6034cdf2c9bbbedc19044",
-  "source_message": "chore(security): add gitleaks ignore for known false positives",
-  "extracted_at": "2026-04-17T23:29:27Z",
+  "source_commit": "9f4cc22f94234e9d493573c0897c1cb35d213af5",
+  "source_message": "fix(security): replace dummy secrets with placeholders + add .gitleaksignore
+
+- scripts/fix-webui-connect.sh: Sec-WebSocket-Key RFC 6455 example nonce → EXAMPLE_NONCE_BASE64
+- docs/bot-archive-analysis.md: LiteLLM local-key example → YOUR_API_KEY_HERE
+- .gitleaksignore: belt-and-suspenders suppression for both false positives
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+  "extracted_at": "2026-04-17T23:39:07Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
