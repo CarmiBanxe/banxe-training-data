@@ -71,7 +71,7 @@ def _watchman_address_search(address: str) -> Optional[dict]:
             "minMatch": "0.95",  # near-exact for addresses
         })
         url = f"{WATCHMAN_URL}/v2/search?{params}"
-        with urllib.request.urlopen(url, timeout=WATCHMAN_TIMEOUT) as resp:  # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected - training example
+        with urllib.request.urlopen(url, timeout=WATCHMAN_TIMEOUT) as resp:
             data = json.loads(resp.read())
             entities = data.get("entities") or []
             if entities:

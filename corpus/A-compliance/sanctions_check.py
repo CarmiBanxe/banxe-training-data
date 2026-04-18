@@ -80,7 +80,7 @@ def _yente_match(name: str, entity_type: str = "person", aliases: list[str] | No
 
     body = json.dumps({"queries": queries}).encode()
     try:
-        req = urllib.request.Request(  # nosemgrep
+        req = urllib.request.Request(
             f"{YENTE_URL}/match",
             data=body,
             headers={"Content-Type": "application/json"},
