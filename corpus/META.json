@@ -1,14 +1,13 @@
 {
   "source_repo": "CarmiBanxe/vibe-coding",
-  "source_commit": "e31862b94ee838c681d40255705ffbfc7cb56e91",
-  "source_message": "fix(ci): fix Build & Deploy Docs — hatchling wheel build config for MkDocs
+  "source_commit": "97994d0b30093aec64297fb3d33393b6c9296b75",
+  "source_message": "fix(ci): relax MkDocs strict mode — allow warnings during build
 
-- pyproject.toml: add [tool.hatch.build.targets.wheel] packages = ["src/compliance"]
-- docs.yml: install docs deps directly without editable install
-  (hatchling could not find banxe_ai_bank/ package directory — broken since #750)
+--strict removed: 12 existing doc warnings treated as errors break CI.
+TODO: fix broken links/missing refs, then re-enable --strict (tracked separately).
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
-  "extracted_at": "2026-04-18T00:04:17Z",
+  "extracted_at": "2026-04-19T01:18:30Z",
   "triggered_by": "CarmiBanxe",
   "sections": ["A-compliance", "B-architecture", "C-scenarios", "D-decisions", "E-feedback"]
 }
